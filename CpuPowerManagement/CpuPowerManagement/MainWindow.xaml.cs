@@ -1,6 +1,6 @@
 ﻿using System.Text;
 using System.Windows;
-using CpuPowerManagement.ViewModel;
+using CpuPowerManagement.ViewModels;
 
 namespace CpuPowerManagement
 {

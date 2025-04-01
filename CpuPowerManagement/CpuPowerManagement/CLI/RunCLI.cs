@@ -1,3 +1,5 @@
+using System.Diagnostics;
+
 namespace CpuPowerManagement.CLI
 {
 	public static class RunCli
@@ -6,9 +8,10 @@ namespace CpuPowerManagement.CLI
 		{
 			try
 			{
-				System.Diagnostics.Process process = new System.Diagnostics.Process();
-				System.Diagnostics.ProcessStartInfo startInfo = new System.Diagnostics.ProcessStartInfo();
+				var process = new Process();
+				var startInfo = new ProcessStartInfo();
 				startInfo.UseShellExecute = false;
+
 				if (readOutput) { startInfo.RedirectStandardOutput = true; } else { startInfo.RedirectStandardOutput = false; }
 
 				startInfo.FileName = processName;
@@ -29,15 +32,15 @@ namespace CpuPowerManagement.CLI
 					process.Close();
 					return output;
 				}
-				else
-				{
-					process.Close();
-					return "COMPLETE";
-				}
+			
+        process.Close();
+        return "COMPLETE";
 			}
 			catch (Exception ex)
 			{
 				var error = "Error running CLI: " + ex.Message + " " + arguments;
+
+        Debug.WriteLine(error);
 				return error;
 			}
 		}

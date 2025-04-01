@@ -1,20 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Linq;
+﻿using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Controls;
 using System.Windows.Input;
 using CommunityToolkit.Mvvm.Input;
+using CpuPowerManagement.Intel;
 
-namespace CpuPowerManagement.ViewModel
+namespace CpuPowerManagement.ViewModels
 {
   public class MainViewModel : INotifyPropertyChanged
   {
-    private int _plLimit1;
+    private int _plLimit1 = 45;
 
     public int PlLimit1
     {
@@ -26,15 +20,15 @@ namespace CpuPowerManagement.ViewModel
       }
     }
 
-    public ICommand ApplyPlLimit1Command { get; }
+    public ICommand ApplyPowerLimit1Command { get; }
     public MainViewModel()
     {
-      ApplyPlLimit1Command = new AsyncRelayCommand<int>(async (i) => await ExecuteApplyPlLimit1Command(i));
+      ApplyPowerLimit1Command = new AsyncRelayCommand<int>(async (i) => await ExecuteApplyPowerLimitCommand(i));
     }
 
-    private async Task ExecuteApplyPlLimit1Command(int item)
+    private async Task ExecuteApplyPowerLimitCommand(int limit)
     {
-    
+      IntelManagement.RunIntelTDPChangeMSR(limit, limit);
 
       //OnPropertyChanged(nameof(WasHiredCountString));
       //OnPropertyChanged(nameof(NoAvailableCountString));

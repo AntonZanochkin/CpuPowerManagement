@@ -4,11 +4,11 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:CpuPowerManagement" 
-        xmlns:viewmodel="clr-namespace:CpuPowerManagement.ViewModel"
+        xmlns:viewModels="clr-namespace:CpuPowerManagement.ViewModels"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
   <Window.DataContext>
-    <viewmodel:MainViewModel />
+    <viewModels:MainViewModel />
   </Window.DataContext>
   <Grid>
       <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Width="300">
@@ -16,12 +16,12 @@
         <Label Content="{Binding PlLimit1}" FontSize="16" HorizontalAlignment="Center"/>
 
         <!-- Slider -->
-        <Slider Minimum="1" Maximum="45" 
+        <Slider Minimum="1" Maximum="45"
                 Value="{Binding PlLimit1, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
                 TickFrequency="1" IsSnapToTickEnabled="True"/>
 
         <Button Content="Apply Power Limit 1"
-                Command="{Binding ApplyPlLimit1Command}"
+                Command="{Binding ApplyPowerLimit1Command}"
                 CommandParameter="{Binding PlLimit1}"
                 Margin="10"/>
     </StackPanel>
