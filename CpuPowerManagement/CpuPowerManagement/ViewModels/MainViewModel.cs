@@ -2,11 +2,11 @@
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
 using CommunityToolkit.Mvvm.Input;
-using CpuPowerManagement.Intel;
+using CpuPowerManagement.Intel.MSR;
 
 namespace CpuPowerManagement.ViewModels
 {
-  public class MainViewModel : INotifyPropertyChanged
+    public class MainViewModel : INotifyPropertyChanged
   {
     private int _plLimit1 = 45;
 
@@ -23,12 +23,14 @@ namespace CpuPowerManagement.ViewModels
     public ICommand ApplyPowerLimit1Command { get; }
     public MainViewModel()
     {
-      ApplyPowerLimit1Command = new AsyncRelayCommand<int>(async (i) => await ExecuteApplyPowerLimitCommand(i));
+      ApplyPowerLimit1Command = new AsyncRelayCommand<int>(ExecuteApplyPowerLimitCommand);
+      var r = IntelManagement.GetPowerLimits();
+      PlLimit1 = (int)r.PL1_Watts;
     }
 
     private async Task ExecuteApplyPowerLimitCommand(int limit)
     {
-      IntelManagement.RunIntelTDPChangeMSR(limit, limit);
+      IntelManagement.SetPl1(limit, limit);
 
       //OnPropertyChanged(nameof(WasHiredCountString));
       //OnPropertyChanged(nameof(NoAvailableCountString));
