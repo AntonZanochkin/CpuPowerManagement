@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.10.35122.118
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CpuPowerManagement", "CpuPowerManagement\CpuPowerManagement.csproj", "{7451C458-A899-4043-82A7-D54A21F68366}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{7451C458-A899-4043-82A7-D54A21F68366}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7451C458-A899-4043-82A7-D54A21F68366}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7451C458-A899-4043-82A7-D54A21F68366}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7451C458-A899-4043-82A7-D54A21F68366}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {B53E28C0-7444-4392-B291-4476623F1FA0}
+	EndGlobalSection
+EndGlobal
