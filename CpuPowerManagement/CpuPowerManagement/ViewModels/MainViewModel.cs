@@ -1,39 +1,51 @@
 ﻿using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Windows;
 using System.Windows.Input;
 using CommunityToolkit.Mvvm.Input;
 using CpuPowerManagement.Intel.MSR;
 
 namespace CpuPowerManagement.ViewModels
 {
-    public class MainViewModel : INotifyPropertyChanged
+  public class MainViewModel : INotifyPropertyChanged
   {
-    private int _plLimit1 = 45;
+    private PowerLimit _powerLimits;
 
-    public int PlLimit1
+    public PowerLimit PowerLimits
     {
-      get => _plLimit1;
-      set
-      {
-        _plLimit1 = value;
-        OnPropertyChanged(nameof(PlLimit1));
-      }
+      get => _powerLimits;
+      set => SetField(ref _powerLimits, value);
     }
 
     public ICommand ApplyPowerLimit1Command { get; }
+    public ICommand ApplyPowerLimit2Command { get; }
+
     public MainViewModel()
     {
-      ApplyPowerLimit1Command = new AsyncRelayCommand<int>(ExecuteApplyPowerLimitCommand);
-      var r = IntelManagement.GetPowerLimits();
-      PlLimit1 = (int)r.PL1_Watts;
+      ApplyPowerLimit1Command = new RelayCommand(ExecuteApplyPowerLimit1Command);
+      ApplyPowerLimit2Command = new RelayCommand(ExecuteApplyPowerLimit2Command);
+
+      if (DesignerProperties.GetIsInDesignMode(new DependencyObject()))
+      {
+        // В режиме дизайна подставляем мок-данные
+        PowerLimits = PowerLimit.CreateMock();
+      }
+      else
+      {
+        PowerLimits = PowerLimit.CreateMock();
+        // В рантайме получаем реальные данные
+       // PowerLimits = IntelManagement.GetPowerLimits();
+      }
     }
 
-    private async Task ExecuteApplyPowerLimitCommand(int limit)
+    private void ExecuteApplyPowerLimit1Command()
     {
-      IntelManagement.SetPl1(limit, limit);
+      IntelManagement.SetPl2((int)PowerLimits.PL1_Watts);
+    }
 
-      //OnPropertyChanged(nameof(WasHiredCountString));
-      //OnPropertyChanged(nameof(NoAvailableCountString));
+    private void ExecuteApplyPowerLimit2Command()
+    {
+      IntelManagement.SetPl2((int)PowerLimits.PL2_Watts);
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;

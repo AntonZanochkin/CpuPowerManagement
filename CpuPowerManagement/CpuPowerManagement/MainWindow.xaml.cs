@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using System.Windows;
+using System.Windows.Input;
 using CpuPowerManagement.ViewModels;
 
 namespace CpuPowerManagement
@@ -10,6 +11,13 @@ namespace CpuPowerManagement
     public MainWindow()
     {
       InitializeComponent();
+
+
+    }
+
+    private void SizeSlider_TouchDown(object? sender, TouchEventArgs e)
+    {
+
     }
   }
 }

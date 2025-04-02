@@ -8,12 +8,12 @@ namespace CpuPowerManagement.Intel.MSR
 {
   public static class IntelManagement
   {
-    public static void SetPl1(int pl1TDP, int pl2TDP)
+    public static void SetPl1(int pl1TDP)
     {
       try
       {
         var hexPL1 = ConvertTdpToHexMsr(pl1TDP);
-        var hexPL2 = ConvertTdpToHexMsr(pl2TDP);
+        var hexPL2 = ConvertTdpToHexMsr(pl1TDP);
 
         hexPL1 = FormatHex(hexPL1);
         hexPL2 = FormatHex(hexPL2);
@@ -27,10 +27,29 @@ namespace CpuPowerManagement.Intel.MSR
       catch (Exception ex) { MessageBox.Show(ex.ToString()); }
     }
 
-    public static MsrPowerLimit GetPowerLimits()
+    public static void SetPl2(int pl2)
     {
       try
       {
+        var hexPL1 = ConvertTdpToHexMsr(pl2);
+        var hexPL2 = ConvertTdpToHexMsr(pl2);
+
+        hexPL1 = FormatHex(hexPL1);
+        hexPL2 = FormatHex(hexPL2);
+
+        var folderPath = Path.GetDirectoryName(Assembly.GetEntryAssembly()?.Location) ?? string.Empty;
+        var commandArguments = "-s write 0x610 0x00438" + hexPL2 + " 0x00dd8" + hexPL1;
+        var processMSR = Path.Combine(folderPath, "Assets\\Intel\\MSR\\msr-cmd.exe");
+
+        RunCli.RunCommand(commandArguments, false, processMSR);
+      }
+      catch (Exception ex) { MessageBox.Show(ex.ToString()); }
+    }
+
+    public static PowerLimit GetPowerLimits()
+    {
+      try
+      { 
         var folderPath = Path.GetDirectoryName(Assembly.GetEntryAssembly()?.Location) ?? string.Empty;
         var processPath = Path.Combine(folderPath, "Assets\\Intel\\MSR\\msr-cmd.exe");
 
@@ -69,8 +88,8 @@ namespace CpuPowerManagement.Intel.MSR
         var pl1Enabled = (msrValue & (1UL << 30)) != 0;
         var pl2Enabled = (msrValue & (1UL << 60)) != 0;
 
-        // Create and return the MsrPowerLimit object
-        return new MsrPowerLimit
+        // Create and return the PowerLimit object
+        return new PowerLimit
         {
           PL1_Watts = pl1Watts,
           PL2_Watts = pl2Watts,
@@ -133,9 +152,9 @@ namespace CpuPowerManagement.Intel.MSR
       }
 
       // Bits 3:0 in MSR 0x606 define Power Units
-      var powerUnitRaw = (int)(msrValue & 0xF);
-      return 1.0 / Math.Pow(2, powerUnitRaw);
-      }
+        var powerUnitRaw = (int)(msrValue & 0xF);
+        return 1.0 / Math.Pow(2, powerUnitRaw);
     }
+  }
 
 }

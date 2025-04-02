@@ -5,25 +5,82 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:CpuPowerManagement" 
         xmlns:viewModels="clr-namespace:CpuPowerManagement.ViewModels"
+        xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
         mc:Ignorable="d"
+        Background="{DynamicResource ApplicationBackgroundBrush}"
+        Foreground="{DynamicResource TextFillColorPrimaryBrush}"
         Title="MainWindow" Height="450" Width="800">
   <Window.DataContext>
     <viewModels:MainViewModel />
   </Window.DataContext>
   <Grid>
-      <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Width="300">
-        <!-- Label to display Slider value -->
-        <Label Content="{Binding PlLimit1}" FontSize="16" HorizontalAlignment="Center"/>
+    <StackPanel Margin="10,10,0,10">
+      <ui:CardExpander Name="sdAmdApuThermal" IsEnabled="True" IsExpanded="True" Icon="Temperature20" Margin="0,0,15,0">
+        <ui:CardExpander.Header>
+          <Grid>
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="*" />
+              <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <StackPanel Grid.Column="0" VerticalAlignment="Center">
+              <TextBlock FontSize="14" FontWeight="Medium" Text="CPU Power Limit" />
+              <TextBlock FontSize="12" Foreground="{DynamicResource TextFillColorTertiaryBrush}" Text="Provides the ability to set CPU Power Limits."/>
+            </StackPanel>
+          </Grid>
+        </ui:CardExpander.Header>
+        <StackPanel>
+          <StackPanel Margin="20,8,0,0">
+            <StackPanel Orientation="Horizontal">
+              <TextBlock FontWeight="DemiBold" FontSize="13" Foreground="{DynamicResource TextFillColorPrimaryBrush}">Power Limit 1</TextBlock>
+            </StackPanel>
 
-        <!-- Slider -->
-        <Slider Minimum="1" Maximum="45"
-                Value="{Binding PlLimit1, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
-                TickFrequency="1" IsSnapToTickEnabled="True"/>
+            <Grid Margin="0,8,0,0">
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="150" />
+                <ColumnDefinition Width="50" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="50" />
+                <ColumnDefinition Width="Auto" />
+              </Grid.ColumnDefinitions>
 
-        <Button Content="Apply Power Limit 1"
-                Command="{Binding ApplyPowerLimit1Command}"
-                CommandParameter="{Binding PlLimit1}"
-                Margin="10"/>
+              <ui:NumberBox Name="nudAPUTemp" 
+                            Value="{Binding PowerLimits.PL1_Watts, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                            Maximum="105" Minimum="10" 
+                            Grid.Column="0" 
+                            SmallChange="1" 
+                            MaxDecimalPlaces="0" />
+
+              <TextBlock Text="{Binding ElementName=SliderPowerLimit1, Path=Minimum}" 
+                         VerticalAlignment="Center"
+                         HorizontalAlignment="Right"
+                         FontSize="12"
+                         Grid.Column="1" Margin="10,0,0,0"/>
+
+              <Slider Name="SliderPowerLimit1" 
+                      Value="{Binding PowerLimits.PL1_Watts}" 
+                      Maximum="105" Minimum="5" 
+                      Grid.Column="2" Margin="5,0,0,0" 
+                      TickFrequency="1" VerticalAlignment="Center" 
+                      IsSnapToTickEnabled="True" 
+                      TouchDown="SizeSlider_TouchDown"/>
+
+              <TextBlock Text="{Binding ElementName=SliderPowerLimit1, Path=Maximum}" 
+                         VerticalAlignment="Center"
+                         HorizontalAlignment="Left"
+                         FontSize="12"
+                         Grid.Column="3" Margin="5,0,0,0"/>
+
+              <Button Content="Apply" 
+                      Command="{Binding ApplyPowerLimit1Command}" 
+                      Grid.Column="4" 
+                      Margin="20,0,0,0" />
+            </Grid>
+
+          </StackPanel>
+          
+        </StackPanel>
+      </ui:CardExpander>
     </StackPanel>
+
   </Grid>
 </Window>
