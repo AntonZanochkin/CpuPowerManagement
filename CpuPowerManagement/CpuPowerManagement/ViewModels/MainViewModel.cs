@@ -32,20 +32,20 @@ namespace CpuPowerManagement.ViewModels
       }
       else
       {
-        PowerLimits = PowerLimit.CreateMock();
+      
         // В рантайме получаем реальные данные
-       // PowerLimits = IntelManagement.GetPowerLimits();
+        PowerLimits = IntelManagement.GetPowerLimits();
       }
     }
 
     private void ExecuteApplyPowerLimit1Command()
     {
-      IntelManagement.SetPl2((int)PowerLimits.PL1_Watts);
+      IntelManagement.SetPl((int)PowerLimits.Pl1Watts, (int)PowerLimits.Pl2Watts);
     }
 
     private void ExecuteApplyPowerLimit2Command()
     {
-      IntelManagement.SetPl2((int)PowerLimits.PL2_Watts);
+      IntelManagement.SetPl((int)PowerLimits.Pl1Watts, (int)PowerLimits.Pl2Watts);
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;

@@ -2,29 +2,29 @@
 {
   public class PowerLimit
   {
-    public double PL1_Watts { get; set; }
-    public double PL2_Watts { get; set; }
-    public double PL1_TimeWindow { get; set; }
-    public double PL2_TimeWindow { get; set; }
-    public bool PL1_Enabled { get; set; }
-    public bool PL2_Enabled { get; set; }
+    public double Pl1Watts { get; set; }
+    public double Pl2Watts { get; set; }
+    public double Pl1TimeWindow { get; set; }
+    public double Pl2TimeWindow { get; set; }
+    public bool Pl1Enabled { get; set; }
+    public bool Pl2Enabled { get; set; }
 
     public static PowerLimit CreateMock()
     {
       return new PowerLimit
       {
-        PL1_Watts = 35,
-        PL2_Watts = 45,
-        PL1_TimeWindow = 40,
-        PL2_TimeWindow = 20,
-        PL1_Enabled = false,
-        PL2_Enabled = true,
+        Pl1Watts = 35,
+        Pl2Watts = 45,
+        Pl1TimeWindow = 40,
+        Pl2TimeWindow = 20,
+        Pl1Enabled = false,
+        Pl2Enabled = true,
       };
     }
     public override string ToString()
     {
-      return $"PL1: {PL1_Watts} W (Enabled: {PL1_Enabled}, Time: {PL1_TimeWindow} sec)\n" +
-             $"PL2: {PL2_Watts} W (Enabled: {PL2_Enabled}, Time: {PL2_TimeWindow} sec)";
+      return $"PL1: {Pl1Watts} W (Enabled: {Pl1Enabled}, Time: {Pl1TimeWindow} sec)\n" +
+             $"PL2: {Pl2Watts} W (Enabled: {Pl2Enabled}, Time: {Pl2TimeWindow} sec)";
     }
   }
 }

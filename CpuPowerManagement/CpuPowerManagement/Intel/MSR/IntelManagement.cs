@@ -1,4 +1,5 @@
-﻿using CpuPowerManagement.CLI;
+﻿using System.Diagnostics;
+using CpuPowerManagement.CLI;
 using System.IO;
 using System.Windows;
 using System.Reflection;
@@ -8,37 +9,34 @@ namespace CpuPowerManagement.Intel.MSR
 {
   public static class IntelManagement
   {
-    public static void SetPl1(int pl1TDP)
+    public static void SetPl(int pl1Limit, int pl2Limit)
     {
       try
       {
-        var hexPL1 = ConvertTdpToHexMsr(pl1TDP);
-        var hexPL2 = ConvertTdpToHexMsr(pl1TDP);
+        var hexPl1 = ConvertTdpToHexMsr(pl1Limit);
+        var hexPl2 = ConvertTdpToHexMsr(pl2Limit);
 
-        hexPL1 = FormatHex(hexPL1);
-        hexPL2 = FormatHex(hexPL2);
+        hexPl1 = FormatHex(hexPl1);
+        hexPl2 = FormatHex(hexPl2);
 
         var folderPath = Path.GetDirectoryName(Assembly.GetEntryAssembly()?.Location) ?? string.Empty;
-        var commandArguments = "-s write 0x610 0x00438" + hexPL2 + " 0x00dd8" + hexPL1;
-        var processMSR = Path.Combine(folderPath, "Assets\\Intel\\MSR\\msr-cmd.exe");
+        var commandArguments = "-s write 0x610 0x00438" + hexPl2 + " 0x00dd8" + hexPl1;
+        var processMsr = Path.Combine(folderPath, "Assets\\Intel\\MSR\\msr-cmd.exe");
 
-        RunCli.RunCommand(commandArguments, false, processMSR);
+        RunCli.RunCommand(commandArguments, false, processMsr);
       }
       catch (Exception ex) { MessageBox.Show(ex.ToString()); }
     }
 
-    public static void SetPl2(int pl2)
+    public static void SetPl2(int pl)
     {
       try
       {
-        var hexPL1 = ConvertTdpToHexMsr(pl2);
-        var hexPL2 = ConvertTdpToHexMsr(pl2);
-
-        hexPL1 = FormatHex(hexPL1);
-        hexPL2 = FormatHex(hexPL2);
+        var hexPl = ConvertTdpToHexMsr(pl);
+        hexPl = FormatHex(hexPl); ;
 
         var folderPath = Path.GetDirectoryName(Assembly.GetEntryAssembly()?.Location) ?? string.Empty;
-        var commandArguments = "-s write 0x610 0x00438" + hexPL2 + " 0x00dd8" + hexPL1;
+        var commandArguments = "-s write 0x610 0x00438" + hexPl;
         var processMSR = Path.Combine(folderPath, "Assets\\Intel\\MSR\\msr-cmd.exe");
 
         RunCli.RunCommand(commandArguments, false, processMSR);
@@ -57,7 +55,10 @@ namespace CpuPowerManagement.Intel.MSR
         var output = RunCli.RunCommand("read 0x610", true, processPath);
         var msrValue = GetMsrValue(output);
 
-        Console.WriteLine($"Raw MSR 0x610: 0x{msrValue:X16}");
+        //ulong newValue = msrValue | (1UL << 30); // Force-enable PL1 (Bit 30)
+        //RunCli.RunCommand($"-s write 0x610 0x{newValue:X16}", true, processPath);
+
+       // Console.WriteLine($"Raw MSR 0x610: 0x{msrValue:X16}");
 
         if (msrValue == 0)
         {
@@ -76,27 +77,36 @@ namespace CpuPowerManagement.Intel.MSR
         var pl2Raw = (int)((msrValue >> 32) & 0x7FFF);
         var pl2Watts = pl2Raw * powerUnit;
 
-        // Extract PL1 Time Window (Bits 23:17)
-        var pl1TimeRaw = (int)((msrValue >> 17) & 0x7F);
-        var pl1TimeWindow = ConvertTimeWindow(pl1TimeRaw);
+        // Extract PL1 Time Window (Bits 23:22 for X, Bits 21:17 for Y)
+        var pl1X = (int)((msrValue >> 22) & 0x3); // Extract X (Bits 23:22)
+        var pl1Y = (int)((msrValue >> 17) & 0x1F); // Extract Y (Bits 21:17)
+        var pl1TimeWindow = ConvertTimeWindow(pl1X, pl1Y);
 
-        // Extract PL2 Time Window (Bits 54:48)
-        var pl2TimeRaw = (int)((msrValue >> 48) & 0x3F);
-        var pl2TimeWindow = ConvertTimeWindow(pl2TimeRaw);
+        // Extract PL2 Time Window (Bits 54:53 for X, Bits 52:48 for Y)
+        var pl2X = (int)((msrValue >> 53) & 0x3); // Extract X (Bits 54:53)
+        var pl2Y = (int)((msrValue >> 48) & 0x1F); // Extract Y (Bits 52:48)
+        var pl2TimeWindow = ConvertTimeWindow(pl2X, pl2Y);
 
-        // Power Limit Enable Flags
-        var pl1Enabled = (msrValue & (1UL << 30)) != 0;
-        var pl2Enabled = (msrValue & (1UL << 60)) != 0;
+        // ✅ Corrected PL1 & PL2 Enable Bits
+        var pl1Enabled = (msrValue & (1UL << 15)) != 0; // Bit 15
+        var pl2Enabled = (msrValue & (1UL << 47)) != 0; // Bit 47
+        var lockedMsr = (msrValue & (1UL << 63)) != 0;
+
+        Debug.WriteLine($"MSR 0x610 Raw Value: {Convert.ToString((long)msrValue, 2).PadLeft(64, '0')}");
+
+        // Convert using your function
+        Debug.WriteLine($"PL1 Time Window (converted): {pl1TimeWindow} sec");
+        Debug.WriteLine($"PL2 Time Window (converted): {pl2TimeWindow} sec");
 
         // Create and return the PowerLimit object
         return new PowerLimit
         {
-          PL1_Watts = pl1Watts,
-          PL2_Watts = pl2Watts,
-          PL1_TimeWindow = pl1TimeWindow,
-          PL2_TimeWindow = pl2TimeWindow,
-          PL1_Enabled = pl1Enabled,
-          PL2_Enabled = pl2Enabled
+          Pl1Watts = pl1Watts,
+          Pl2Watts = pl2Watts,
+          Pl1TimeWindow = pl1TimeWindow,
+          Pl2TimeWindow = pl2TimeWindow,
+          Pl1Enabled = pl1Enabled,
+          Pl2Enabled = pl2Enabled
         };
       }
       catch (Exception ex)
@@ -117,12 +127,11 @@ namespace CpuPowerManagement.Intel.MSR
       return hexValue.PadLeft(3, '0');
     }
 
-    private static double ConvertTimeWindow(int rawTime)
+    private static double ConvertTimeWindow(int x, int y)
     {
-      var multiplier = (rawTime & 0x3) + 1;
-      var exponent = (rawTime >> 3) & 0x1F;
-      return multiplier * Math.Pow(2, exponent);
+      return (1 + (x / 4.0)) * Math.Pow(2, y);
     }
+
 
     private static ulong GetMsrValue(string msrOutput)
     {
@@ -151,9 +160,13 @@ namespace CpuPowerManagement.Intel.MSR
         return 0.125;  // Default = 1/8 W
       }
 
+
+      var powerUnitRaw = (int)(msrValue & 0xF);  // Mask only bits 3:0
+      var powerUnit = 1.0 / Math.Pow(2, powerUnitRaw);
+      return powerUnit;
       // Bits 3:0 in MSR 0x606 define Power Units
-        var powerUnitRaw = (int)(msrValue & 0xF);
-        return 1.0 / Math.Pow(2, powerUnitRaw);
+      //var powerUnitRaw = (int)(msrValue & 0xF);
+      //  return 1.0 / Math.Pow(2, powerUnitRaw);
     }
   }
 
