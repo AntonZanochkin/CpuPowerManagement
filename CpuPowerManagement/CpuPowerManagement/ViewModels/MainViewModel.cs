@@ -18,12 +18,12 @@ namespace CpuPowerManagement.ViewModels
     }
 
     public ICommand ApplyPowerLimit1Command { get; }
-    public ICommand ApplyPowerLimit2Command { get; }
+    //public ICommand ApplyPowerLimit2Command { get; }
 
     public MainViewModel()
     {
-      ApplyPowerLimit1Command = new RelayCommand(ExecuteApplyPowerLimit1Command);
-      ApplyPowerLimit2Command = new RelayCommand(ExecuteApplyPowerLimit2Command);
+      ApplyPowerLimit1Command = new AsyncRelayCommand(ExecuteApplyPowerLimit1CommandAsync);
+      //ApplyPowerLimit2Command = new RelayCommand(ExecuteApplyPowerLimit2Command);
 
       if (DesignerProperties.GetIsInDesignMode(new DependencyObject()))
       {
@@ -38,14 +38,13 @@ namespace CpuPowerManagement.ViewModels
       }
     }
 
-    private void ExecuteApplyPowerLimit1Command()
+    private async Task ExecuteApplyPowerLimit1CommandAsync()
     {
-      IntelManagement.SetPl((int)PowerLimits.Pl1Watts, (int)PowerLimits.Pl2Watts);
-    }
-
-    private void ExecuteApplyPowerLimit2Command()
-    {
-      IntelManagement.SetPl((int)PowerLimits.Pl1Watts, (int)PowerLimits.Pl2Watts);
+      IntelManagement.SetPl(PowerLimits);
+      await Task.Delay(1000);
+      PowerLimits = IntelManagement.GetPowerLimits();
+      //IntelManagement.SetPl1TimeWindow(PowerLimits.Pl1TimeWindowSec);
+      //IntelManagement.SetPl2TimeWindow(PowerLimits.Pl2TimeWindowSec);
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;
