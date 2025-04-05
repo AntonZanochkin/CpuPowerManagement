@@ -10,6 +10,13 @@ namespace CpuPowerManagement.Intel.MSR
   {
     static readonly string FolderPath = Path.GetDirectoryName(Assembly.GetEntryAssembly()?.Location) ?? string.Empty;
     static readonly string ProcessMsr = Path.Combine(FolderPath, "Assets\\Intel\\MSR\\msr-cmd.exe");
+    static readonly double Msr606TimeUnit;
+    static IntelManagement()
+    {
+      var output606 = RunCli.RunCommand("read 0x606", true, ProcessMsr);
+      var msr606Value = GetMsrValue(output606);
+      Msr606TimeUnit = GetTimeUnitFromMsr(msr606Value);
+    }
 
     public static void SetPl(PowerLimit limits)
     {
@@ -23,8 +30,8 @@ namespace CpuPowerManagement.Intel.MSR
         int encodedTime1 = EncodeTimeWindow(limits.Pl1TimeWindowSec * 1000);
         int encodedTime2 = EncodeTimeWindow(limits.Pl2TimeWindowSec * 1000);
 
-        var d1 = DecodeTimeWindow(encodedTime1);
-        var d2 = DecodeTimeWindow(encodedTime2);
+        //var d1 = DecodeTimeWindow(encodedTime1);
+        //var d2 = DecodeTimeWindow(encodedTime2);
 
         // Construct the full 64-bit MSR value
         ulong msrValue = 0;
@@ -80,20 +87,12 @@ namespace CpuPowerManagement.Intel.MSR
       return (bestB << 5) | bestL;  // Store B in bits [6:5] and L in bits [4:0]
     }
 
-    //private static double DecodeTimeWindow(int encodedValue)
-    //{
-    //  int L = encodedValue & 0x1F;  // Extract lower 5 bits
-    //  int B = (encodedValue >> 5) & 0x3; // Extract upper 2 bits
-
-    //  return Math.Pow(2, L) * (1 + B / 4.0);
-    //}
-
-    private static double DecodeTimeWindow(int encodedValue)
+    public static double DecodeTimeWindow(int encodedValue, double timeUnit)
     {
       int L = encodedValue & 0x1F;  // Extract lower 5 bits
       int B = (encodedValue >> 5) & 0x3; // Extract upper 2 bits
 
-      return (Math.Pow(2, L) * (1 + B / 4.0)) / 1024;  // Convert from ms to sec
+      return (Math.Pow(2, L) * (1 + B / 4.0)) * timeUnit;
     }
 
 
@@ -109,28 +108,6 @@ namespace CpuPowerManagement.Intel.MSR
       return msrValue.ToString("X");
     }
 
-
-    //public static void SetPl(int pl1Limit, int pl2Limit)
-    //{
-    //  try
-    //  {
-    //    var hexPl1 = ConvertTdpToHexMsr(pl1Limit);
-    //    var hexPl2 = ConvertTdpToHexMsr(pl2Limit);
-
-    //    hexPl1 = FormatHex(hexPl1);
-    //    hexPl2 = FormatHex(hexPl2);
-
-    //    var commandArguments = "-s write 0x610 0x00438" + hexPl2 + " 0x00dd8" + hexPl1;
-
-    //    RunCli.RunCommand(commandArguments, false, ProcessMsr);
-    //  }
-    //  catch (Exception ex) { MessageBox.Show(ex.ToString()); }
-    //}
-
-    /// <summary>
-    /// Sets the PL1 Time Window (in seconds) in MSR 0x610.
-    /// </summary>
-    /// <param name="pl1TimeSeconds">The desired PL1 time window in seconds.</param>
     public static void SetPl1TimeWindow(double pl1TimeSeconds)
     {
       try
@@ -194,10 +171,10 @@ namespace CpuPowerManagement.Intel.MSR
       try
       {
         // Read MSR 0x610
-        var output = RunCli.RunCommand("read 0x610", true, ProcessMsr);
-        var msrValue = GetMsrValue(output);
+        var output610 = RunCli.RunCommand("read 0x610", true, ProcessMsr);
+        var msrValue610 = GetMsrValue(output610);
 
-        if (msrValue == 0)
+        if (msrValue610 == 0)
         {
           MessageBox.Show("Failed to read MSR 0x610.");
           return null;
@@ -207,24 +184,24 @@ namespace CpuPowerManagement.Intel.MSR
         var powerUnit = GetPowerUnit();
 
         // Extract PL1 (Bits 14:0) and convert to watts
-        var pl1Raw = (int)(msrValue & 0x7FFF);
+        var pl1Raw = (int)(msrValue610 & 0x7FFF);
         var pl1Watts = pl1Raw * powerUnit;
 
         // Extract PL2 (Bits 46:32) and convert to watts
-        var pl2Raw = (int)((msrValue >> 32) & 0x7FFF);
+        var pl2Raw = (int)((msrValue610 >> 32) & 0x7FFF);
         var pl2Watts = pl2Raw * powerUnit;
 
-        var encodedTime1 = (int)((msrValue >> 17) & 0x7F); // Bits 23:17
-        var pl1TimeWindow = DecodeTimeWindow(encodedTime1);
+        var encodedTime1 = (int)((msrValue610 >> 17) & 0x7F); // Bits 23:17
+        var pl1TimeWindow = DecodeTimeWindow(encodedTime1, Msr606TimeUnit);
 
         // Extract PL2 Time Window (Bits 55:49)
-        var encodedTime2 = (int)((msrValue >> 49) & 0x7F); // Bits 55:49
-        var pl2TimeWindow = DecodeTimeWindow(encodedTime2);
+        var encodedTime2 = (int)((msrValue610 >> 49) & 0x7F); // Bits 55:49
+        var pl2TimeWindow = DecodeTimeWindow(encodedTime2, Msr606TimeUnit);
         // Extract enable bits for PL1 and PL2 (Bits 15 and 47)
-        var pl1Enabled = (msrValue & (1UL << 15)) != 0; // Bit 15
-        var pl2Enabled = (msrValue & (1UL << 47)) != 0; // Bit 47
+        var pl1Enabled = (msrValue610 & (1UL << 15)) != 0; // Bit 15
+        var pl2Enabled = (msrValue610 & (1UL << 47)) != 0; // Bit 47
 
-        var lockedMsr = (msrValue & (1UL << 63)) != 0;
+        var lockedMsr = (msrValue610 & (1UL << 63)) != 0;
         // Create and return the PowerLimit object
         return new PowerLimit
         {
@@ -242,6 +219,14 @@ namespace CpuPowerManagement.Intel.MSR
         MessageBox.Show($"Error: {ex.Message}\n{ex.StackTrace}");
         return null;
       }
+    }
+
+    public static double GetTimeUnitFromMsr(ulong msrValue)
+    {
+      // MSR_RAPL_POWER_UNIT format:
+      // Bits 19:16 = TimeUnit (as 2^(-x))
+      int timeUnitBits = (int)((msrValue >> 16) & 0xF); // extract bits 19:16
+      return Math.Pow(2, -timeUnitBits); // 2^(-TimeUnit)
     }
 
     //private static double DecodeTimeWindow(int encodedValue)
@@ -331,33 +316,5 @@ namespace CpuPowerManagement.Intel.MSR
       // Encode (B << 5) | L (7-bit format)
       return ((B & 0x3) << 5) | (L & 0x1F);
     }
-
-    //private static int EncodeTimeWindow(double seconds)
-    //{
-    //  int bestL = 0;
-    //  int bestB = 0;
-    //  double minError = double.MaxValue;
-
-    //  // Try all possible L and B values
-    //  for (int L = 0; L < 32; L++)  // L is 5 bits (0 to 31)
-    //  {
-    //    for (int B = 0; B < 4; B++) // B is 2 bits (0 to 3)
-    //    {
-    //      double candidateTime = Math.Pow(2, L) * (1 + (B / 4.0)); // Formula from Intel Docs
-    //      double error = Math.Abs(candidateTime - seconds);
-
-    //      if (error < minError)
-    //      {
-    //        minError = error;
-    //        bestL = L;
-    //        bestB = B;
-    //      }
-    //    }
-    //  }
-
-    //  return (bestB << 5) | bestL;  // Store B in bits [6:5] and L in bits [4:0]
-    //}
-
-
   }
 }
