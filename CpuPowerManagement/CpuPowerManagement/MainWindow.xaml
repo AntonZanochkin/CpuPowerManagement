@@ -9,14 +9,14 @@
         mc:Ignorable="d"
         Background="{DynamicResource ApplicationBackgroundBrush}"
         Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-        Title="MainWindow" Height="621" Width="800">
- 
+        Title="MainWindow" Height="700" Width="800">
+
   <Window.DataContext>
     <viewModels:MainViewModel />
   </Window.DataContext>
   <Grid>
-    <StackPanel Margin="10,10,0,20">
-      <ui:CardExpander IsEnabled="True" IsExpanded="True" Icon="Temperature20" Margin="0,0,15,0" Height="595">
+    <StackPanel Margin="10,10,0,3">
+      <ui:CardExpander IsEnabled="True" IsExpanded="True" Icon="Temperature20" Margin="0,0,15,0" Height="560">
         <ui:CardExpander.Header>
           <Grid>
             <Grid.ColumnDefinitions>
@@ -29,15 +29,12 @@
             </StackPanel>
           </Grid>
         </ui:CardExpander.Header>
-        <StackPanel>
-          <StackPanel Margin="20,10,0,10" Orientation="Horizontal">
-            <TextBlock FontWeight="DemiBold" VerticalAlignment="Center" FontSize="13" Foreground="{DynamicResource TextFillColorPrimaryBrush}">Power Limit 1</TextBlock>
-            <CheckBox Name="PowerLimit1Enabled" Content="Enabled" IsChecked="True"/>
-            <Button Content="Apply" 
-                    Command="{Binding ApplyPowerLimit1Command}" 
-                    Margin="20,0,0,0" />
+        <StackPanel Height="500">
+          <StackPanel Margin="10,10,0,10" Orientation="Horizontal">
+
+            <CheckBox Name="PowerLimit1Enabled" Content="Power Limit 1" IsChecked="{Binding PowerLimit.Pl1Enabled}"/>
           </StackPanel>
-              <!-- Power Limit 1 Wats  -->
+          <!-- Power Limit 1 Wats  -->
           <StackPanel Margin="20,10,0,10" IsEnabled="{Binding ElementName=PowerLimit1Enabled, Path= IsChecked}">
             <StackPanel Orientation="Horizontal">
               <TextBlock FontWeight="DemiBold" FontSize="13" Foreground="{DynamicResource TextFillColorPrimaryBrush}">Power Limit 1 Wats</TextBlock>
@@ -79,7 +76,7 @@
                          FontSize="12"
                          Grid.Column="3" Margin="5,0,0,0"/>
 
-              
+
             </Grid>
           </StackPanel>
           <!-- Power Limit 1 Time Window Sec.-->
@@ -125,11 +122,13 @@
             </Grid>
           </StackPanel>
           <!-- Power Limit 2 Wats  -->
+          <StackPanel Margin="10,10,0,10" Orientation="Horizontal">
+            <CheckBox Name="PowerLimit2Enabled"
+                        Content="Power Limit 2"
+                        IsChecked="{Binding PowerLimit.Pl2Enabled}"/>
+          </StackPanel>
+          <!-- Power Limit 2 Time Window Sec.-->
           <StackPanel Margin="20,10,0,10">
-            <StackPanel Orientation="Horizontal">
-              <TextBlock FontWeight="DemiBold" FontSize="13" Foreground="{DynamicResource TextFillColorPrimaryBrush}">Power Limit 2 Wats</TextBlock>
-            </StackPanel>
-
             <Grid Margin="0,8,0,0">
               <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="150" />
@@ -169,7 +168,6 @@
                          FontSize="12"
                          Grid.Column="3" Margin="5,0,0,0"/>
             </Grid>
-
           </StackPanel>
           <!-- Power Limit 2 Time Window Sec.-->
           <StackPanel Margin="20,10,0,10">
@@ -213,10 +211,15 @@
                          Grid.Column="3" Margin="5,0,0,0"/>
             </Grid>
           </StackPanel>
-        </StackPanel>
 
+          <!-- Apply-->
+          <StackPanel Margin="20,10,0,10" HorizontalAlignment="Right">
+            <Button Content="Apply" Command="{Binding ApplyPowerLimit1Command}"
+                    Height="40" Width="159"  Margin="0,0,20,0" />
+          </StackPanel>
+
+        </StackPanel>
       </ui:CardExpander>
     </StackPanel>
-
   </Grid>
 </Window>
