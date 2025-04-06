@@ -7,19 +7,19 @@ namespace CpuPowerManagement.Components
   {
     static DiscreteValueSlider()
     {
-       DefaultStyleKeyProperty.OverrideMetadata(typeof(DiscreteValueSlider),
-         new FrameworkPropertyMetadata(typeof(DiscreteValueSlider)));
+      DefaultStyleKeyProperty.OverrideMetadata(typeof(DiscreteValueSlider),
+          new FrameworkPropertyMetadata(typeof(DiscreteValueSlider)));
     }
 
     public double[] AllowedValues
     {
-       get => (double[])GetValue(AllowedValuesProperty);
-       set => SetValue(AllowedValuesProperty, value);
+      get => (double[])GetValue(AllowedValuesProperty);
+      set => SetValue(AllowedValuesProperty, value);
     }
 
     public static readonly DependencyProperty AllowedValuesProperty =
-      DependencyProperty.Register("AllowedValues", typeof(double[]), typeof(DiscreteValueSlider),
-        new PropertyMetadata(Array.Empty<double>(), OnAllowedValuesChanged));
+        DependencyProperty.Register("AllowedValues", typeof(double[]), typeof(DiscreteValueSlider),
+            new PropertyMetadata(Array.Empty<double>(), OnAllowedValuesChanged));
 
     private static void OnAllowedValuesChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
     {
@@ -42,7 +42,11 @@ namespace CpuPowerManagement.Components
 
       var snappedValue = AllowedValues[index];
 
+      // Update the actual value being represented by the slider
       SelectedRealValue = snappedValue;
+
+      // Optionally, log or debug to check for updates
+      Console.WriteLine($"Slider Value Changed: {snappedValue}");
     }
 
     public double MinimumValue
@@ -62,7 +66,22 @@ namespace CpuPowerManagement.Components
     }
 
     public static readonly DependencyProperty SelectedRealValueProperty =
-      DependencyProperty.Register("SelectedRealValue", typeof(double), typeof(DiscreteValueSlider), new PropertyMetadata(0.0));
+        DependencyProperty.Register("SelectedRealValue", typeof(double), typeof(DiscreteValueSlider), new PropertyMetadata(0.0, OnSelectedRealValueChanged));
+
+    // Ensure that the slider reacts when the value changes programmatically
+    private static void OnSelectedRealValueChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+      if (d is not DiscreteValueSlider slider || slider.AllowedValues == null || slider.AllowedValues.Length == 0) return;
+
+      // Manually trigger the value change logic for the slider
+      var snappedValue = (double)e.NewValue;
+      var index = Array.IndexOf(slider.AllowedValues, snappedValue);
+      if (index != -1)
+      {
+        slider.Value = index; // Set the slider value
+      }
+    }
   }
+
 
 }
