@@ -1,6 +1,6 @@
 ﻿namespace CpuPowerManagement.Intel.MSR
 {
-  public class PowerLimit
+  public class MsrPowerLimit
   {
     public int Pl1Watts { get; set; }
     public int Pl2Watts { get; set; }
@@ -10,15 +10,15 @@
     public bool Pl2Enabled { get; set; }
     public bool LockedMsr { get; set; }
 
-    public static PowerLimit CreateMock()
+    public static MsrPowerLimit CreateMock()
     {
-      return new PowerLimit
+      return new MsrPowerLimit
       {
         LockedMsr = false,
         Pl1Watts = 35,
         Pl2Watts = 45,
-        Pl2TimeWindowSec = 28,
-        Pl1TimeWindowSec = 0.003,
+        Pl1TimeWindowSec = 10,
+        Pl2TimeWindowSec = 5,
         Pl1Enabled = false,
         Pl2Enabled = true,
       };

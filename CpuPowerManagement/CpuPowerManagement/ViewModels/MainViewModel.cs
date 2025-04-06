@@ -1,9 +1,7 @@
-﻿using System.Collections.Generic;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows;
-using System.Windows.Documents;
 using System.Windows.Input;
 using CommunityToolkit.Mvvm.Input;
 using CpuPowerManagement.Intel.MSR;
@@ -12,44 +10,41 @@ namespace CpuPowerManagement.ViewModels
 {
   public class MainViewModel : INotifyPropertyChanged
   {
-    private PowerLimit _powerLimits;
-    public List<double> ValidTimeStepsDouble { get; set; } = GenerateValidTimeStepsDouble();
-    public ObservableCollection<string> ValidTimeSteps { get; set; } = GenerateValidTimeSteps();
+    private IntelManagement _intelManagement = new IntelManagement();
 
-    public PowerLimit PowerLimits
+    private MsrPowerLimit _powerLimit;
+    //public List<double> ValidTimeStepsDouble { get; set; } = GenerateValidTimeStepsDouble();
+    public double[] ValidTimeSteps { get; set; } = GenerateValidTimeSteps();
+    public double MinValidTime => ValidTimeSteps?.FirstOrDefault() ?? 0.000;
+    public double MaxValidTime => ValidTimeSteps?.LastOrDefault() ?? 1000;
+
+    public MsrPowerLimit PowerLimit
     {
-      get => _powerLimits;
-      set => SetField(ref _powerLimits, value);
+      get => _powerLimit;
+      set => SetField(ref _powerLimit, value);
     }
 
     public ICommand ApplyPowerLimit1Command { get; }
 
     public MainViewModel()
     {
-      //;
       ApplyPowerLimit1Command = new AsyncRelayCommand(ExecuteApplyPowerLimit1CommandAsync);
-      //ApplyPowerLimit2Command = new RelayCommand(ExecuteApplyPowerLimit2Command);
 
       if (DesignerProperties.GetIsInDesignMode(new DependencyObject()))
       {
-        // В режиме дизайна подставляем мок-данные
-        PowerLimits = PowerLimit.CreateMock();
+        PowerLimit = MsrPowerLimit.CreateMock();
       }
       else
       {
-      
-        // В рантайме получаем реальные данные
-        PowerLimits = IntelManagement.GetPowerLimits();
+        PowerLimit = _intelManagement.ReadMsrPowerLimit();
       }
     }
 
     private async Task ExecuteApplyPowerLimit1CommandAsync()
     {
-      IntelManagement.SetPl(PowerLimits);
+      _intelManagement.WritePowerLimit(PowerLimit);
       await Task.Delay(1000);
-      PowerLimits = IntelManagement.GetPowerLimits();
-      //IntelManagement.SetPl1TimeWindow(PowerLimits.Pl1TimeWindowSec);
-      //IntelManagement.SetPl2TimeWindow(PowerLimits.Pl2TimeWindowSec);
+      PowerLimit = _intelManagement.ReadMsrPowerLimit();
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;
@@ -67,45 +62,24 @@ namespace CpuPowerManagement.ViewModels
       return true;
     }
 
-    private static ObservableCollection<string> GenerateValidTimeSteps()
+    private static double[] GenerateValidTimeSteps()
     {
-      var steps = new List<string>();
+      var steps = new List<double>(); // use HashSet to avoid duplicates
 
-      steps.Add("Unlimited");
-      steps.AddRange(GenerateValidTimeStepsDouble().Select(x=>x.ToString()));
-     
-      return new ObservableCollection<string>(steps);
-    }
-
-    private static List<double> GenerateValidTimeStepsDouble()
-    {
-      var steps = new List<double>();
-
-      //for (int y = 0; y <= 31; y++)
-      //{
-      //  var time = IntelManagement.DecodeTimeWindow(y);
-      //  if (time >= 1) break;
-      //  steps.Add(Math.Round(time, 5));
-      //}
-
-      for (int y = 0; y <= 31; y++)
+      for (var y = 0; y <= 31; y++)
       {
-        var time = IntelManagement.DecodeTimeWindow(y, 1/1024);
-       
-        steps.Add(Math.Round(time, 5));
+        for (var z = 0; z <= 3; z++)
+        {
+          var time = Math.Pow(2, y) * (1 + z / 4.0) * 1/1024;
+
+          if (time > 0 && time < 1000)
+            steps.Add(Math.Round(time, 5));
+        }
       }
 
-      //for (int y = 0; y <= 31; y++)
-      //{
-      //  for (int z = 0; z <= 3; z++)
-      //  {
-      //    double time = Math.Pow(2, y) * (1 + z / 4.0);
-      //    if (time > 0 && time < 1000) // optional max cap
-      //      steps.Add((Math.Round(time, 3)));
-      //  }
-      //}
+      steps[0] = 0;
 
-      return steps;
+      return steps.ToArray();
     }
   }
 }

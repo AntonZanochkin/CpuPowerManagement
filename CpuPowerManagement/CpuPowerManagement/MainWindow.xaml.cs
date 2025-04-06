@@ -21,15 +21,12 @@ namespace CpuPowerManagement
 
     }
 
-    private void SliderPl1TimeWindowSec_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+    private void SliderTimeWindowSec_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
     {
       var slider = sender as Slider;
       if (slider == null) return;
 
-      if(slider.Value == 0)
-        return;
-
-      double closest = ViewModel.ValidTimeStepsDouble.OrderBy(x => Math.Abs(x - slider.Value)).FirstOrDefault();
+      var closest = ViewModel.ValidTimeSteps.OrderBy(x => Math.Abs(x - slider.Value)).FirstOrDefault();
       slider.Value = closest;
     }
   }

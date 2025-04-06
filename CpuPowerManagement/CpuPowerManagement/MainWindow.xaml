@@ -3,19 +3,20 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:CpuPowerManagement" 
         xmlns:viewModels="clr-namespace:CpuPowerManagement.ViewModels"
         xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+        xmlns:components="clr-namespace:CpuPowerManagement.Components"
         mc:Ignorable="d"
         Background="{DynamicResource ApplicationBackgroundBrush}"
         Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-        Title="MainWindow" Height="450" Width="800">
+        Title="MainWindow" Height="621" Width="800">
+ 
   <Window.DataContext>
     <viewModels:MainViewModel />
   </Window.DataContext>
   <Grid>
-    <StackPanel Margin="10,10,0,10">
-      <ui:CardExpander Name="sdAmdApuThermal" IsEnabled="True" IsExpanded="True" Icon="Temperature20" Margin="0,0,15,0">
+    <StackPanel Margin="10,10,0,20">
+      <ui:CardExpander IsEnabled="True" IsExpanded="True" Icon="Temperature20" Margin="0,0,15,0" Height="595">
         <ui:CardExpander.Header>
           <Grid>
             <Grid.ColumnDefinitions>
@@ -29,8 +30,12 @@
           </Grid>
         </ui:CardExpander.Header>
         <StackPanel>
-          <!-- Power Limit 1 Wats  --> 
-          <StackPanel Margin="20,10,0,10">
+          <StackPanel Margin="20,10,0,10" Orientation="Horizontal">
+            <TextBlock FontWeight="DemiBold" VerticalAlignment="Center" FontSize="13" Foreground="{DynamicResource TextFillColorPrimaryBrush}">Power Limit 1</TextBlock>
+            <CheckBox Name="PowerLimit1Enabled" Content="Enabled" IsChecked="True"/>
+          </StackPanel>
+              <!-- Power Limit 1 Wats  -->
+          <StackPanel Margin="20,10,0,10" IsEnabled="{Binding ElementName=PowerLimit1Enabled, Path= IsChecked}">
             <StackPanel Orientation="Horizontal">
               <TextBlock FontWeight="DemiBold" FontSize="13" Foreground="{DynamicResource TextFillColorPrimaryBrush}">Power Limit 1 Wats</TextBlock>
             </StackPanel>
@@ -44,7 +49,7 @@
               </Grid.ColumnDefinitions>
 
               <ui:NumberBox Name="Pl1WattsNumberBox" 
-                Value="{Binding PowerLimits.Pl1Watts, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                Value="{Binding PowerLimit.Pl1Watts, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
                 Minimum="5" Maximum="105"                             
                 Grid.Column="0" 
                 SmallChange="1" 
@@ -57,7 +62,7 @@
                          Grid.Column="1" Margin="10,0,0,0"/>
 
               <Slider Name="SliderPowerLimit1Wats" 
-                      Value="{Binding PowerLimits.Pl1Watts}"
+                      Value="{Binding PowerLimit.Pl1Watts}"
                       Minimum="{Binding ElementName=Pl1WattsNumberBox, Path=Minimum}" 
                       Maximum="{Binding ElementName=Pl1WattsNumberBox, Path=Maximum}"
                       Grid.Column="2" Margin="5,0,0,0" 
@@ -92,28 +97,31 @@
               </Grid.ColumnDefinitions>
 
               <ComboBox 
-                Name="Pl1TimeWindowSecNumberBox"
+                Name="Pl1TimeWindowSecComboBox"
                 ItemsSource="{Binding ValidTimeSteps}"
-                SelectedItem="{Binding PowerLimits.Pl1TimeWindowSec, Mode=TwoWay}" 
+                SelectedItem="{Binding PowerLimit.Pl1TimeWindowSec, Mode=TwoWay}" 
                 Grid.Column="0"/>
 
-              <!--
-              <ui:NumberBox
-                Name="Pl1TimeWindowSecNumberBox"
-                Value="{Binding PowerLimits.Pl1TimeWindowSec, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
-                Minimum="0.001"
-                Maximum="1000" 
-                Grid.Column="0" 
-                SmallChange="0.001"
-                MaxDecimalPlaces="3" />
--->
-              <Slider Name="SliderPl1TimeWindowSec"
-                      Minimum="{Binding ValidTimeStepsDouble[1]}"
-                      Maximum="{Binding ValidTimeStepsDouble[ValidTimeStepsDouble.Count-1]}"
-                      Value="{Binding PowerLimits.Pl1TimeWindowSec, Mode=TwoWay}"
-                      ValueChanged="SliderPl1TimeWindowSec_ValueChanged"
-                      IsSnapToTickEnabled="True" 
-                      Grid.Column="2"/>
+              <TextBlock Text="{Binding ElementName=SliderPl1TimeWindowSec, Path=MinimumValue}" 
+                         VerticalAlignment="Center"
+                         HorizontalAlignment="Right"
+                         FontSize="12"
+                         Grid.Column="1" Margin="10,0,0,0"/>
+
+              <components:DiscreteValueSlider 
+                x:Name="SliderPl1TimeWindowSec"
+                AllowedValues="{Binding ValidTimeSteps}"
+                SelectedRealValue="{Binding PowerLimit.Pl1TimeWindowSec, Mode=TwoWay}"
+                VerticalAlignment="Center"
+                Grid.Column="2" Margin="5,0,0,0"
+                >
+              </components:DiscreteValueSlider>
+
+              <TextBlock Text="{Binding ElementName=SliderPl1TimeWindowSec, Path=MaximumValue}" 
+                         VerticalAlignment="Center"
+                         HorizontalAlignment="Left"
+                         FontSize="12"
+                         Grid.Column="3" Margin="5,0,0,0"/>
 
               <Button Content="Apply" 
                 Command="{Binding ApplyPowerLimit1Command}" 
@@ -138,7 +146,7 @@
 
               <ui:NumberBox 
                 Name="Pl2WattsNumberBox" 
-                Value="{Binding PowerLimits.Pl2Watts, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                Value="{Binding PowerLimit.Pl2Watts, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
                 Minimum="10" 
                 Maximum="105" 
                 Grid.Column="0" 
@@ -152,7 +160,7 @@
                          Grid.Column="1" Margin="10,0,0,0"/>
 
               <Slider Name="SliderPowerLimit2Wats" 
-                      Value="{Binding PowerLimits.Pl2Watts}" 
+                      Value="{Binding PowerLimit.Pl2Watts}" 
                       Minimum="{Binding ElementName=Pl2WattsNumberBox, Path=Minimum}" 
                       Maximum="{Binding ElementName=Pl2WattsNumberBox, Path=Maximum}"
                       Grid.Column="2" Margin="5,0,0,0" 
@@ -187,38 +195,35 @@
                 <ColumnDefinition Width="Auto" />
               </Grid.ColumnDefinitions>
 
-              <ui:NumberBox 
-                Name="Pl2TimeWindowSecNumberBox"
-                Value="{Binding PowerLimits.Pl2TimeWindowSec, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
-                Minimum="0.001"
-                Maximum="1000" 
-                Grid.Column="0" 
-                SmallChange="0.001"
-                MaxDecimalPlaces="3" />
-              <TextBlock Text="{Binding ElementName=SliderPl2TimeWindowSec, Path=Minimum}" 
+              <ComboBox 
+                Name="Pl2TimeWindowSecComboBox"
+                ItemsSource="{Binding ValidTimeSteps}"
+                SelectedItem="{Binding PowerLimit.Pl2TimeWindowSec, Mode=TwoWay}" 
+                Grid.Column="0"/>
+
+              <TextBlock Text="{Binding ElementName=SliderPl2TimeWindowSec, Path=MinimumValue}" 
                          VerticalAlignment="Center"
                          HorizontalAlignment="Right"
                          FontSize="12"
                          Grid.Column="1" Margin="10,0,0,0"/>
 
-              <Slider Name="SliderPl2TimeWindowSec" 
-                      Value="{Binding PowerLimits.Pl2TimeWindowSec}" 
-                      Minimum="{Binding ElementName=Pl2TimeWindowSecNumberBox, Path=Minimum}" 
-                      Maximum="{Binding ElementName=Pl2TimeWindowSecNumberBox, Path=Maximum}"
-                      Grid.Column="2" Margin="5,0,0,0"
-                      TickFrequency="1" VerticalAlignment="Center" 
-                      IsSnapToTickEnabled="True"
-                      SmallChange="0.001"
-                      TouchDown="SizeSlider_TouchDown"/>
+              <components:DiscreteValueSlider 
+                x:Name="SliderPl2TimeWindowSec"
+                AllowedValues="{Binding ValidTimeSteps}"
+                SelectedRealValue="{Binding PowerLimit.Pl2TimeWindowSec, Mode=TwoWay}"
+                VerticalAlignment="Center"
+                Grid.Column="2" Margin="5,0,0,0"
+              >
+              </components:DiscreteValueSlider>
 
-              <TextBlock Text="{Binding ElementName=SliderPl2TimeWindowSec, Path=Maximum}" 
+              <TextBlock Text="{Binding ElementName=SliderPl2TimeWindowSec, Path=MaximumValue}" 
                          VerticalAlignment="Center"
                          HorizontalAlignment="Left"
                          FontSize="12"
                          Grid.Column="3" Margin="5,0,0,0"/>
 
               <Button Content="Apply" 
-                      Command="{Binding ApplyPowerLimit2Command}" 
+                      Command="{Binding ApplyPowerLimit1Command}" 
                       Grid.Column="4" 
                       Margin="20,0,0,0" />
             </Grid>
