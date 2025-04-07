@@ -1,22 +1,19 @@
-﻿using System.Collections.ObjectModel;
+﻿using CommunityToolkit.Mvvm.Input;
+using CpuPowerManagement.Intel.MSR;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Input;
-using CommunityToolkit.Mvvm.Input;
-using CpuPowerManagement.Intel.MSR;
 
-namespace CpuPowerManagement.ViewModels
+namespace CpuPowerManagement.ViewModels.UserControls
 {
-  public class MainViewModel : INotifyPropertyChanged
+  public class PowerLimitViewModel : INotifyPropertyChanged
   {
-    private IntelManagement _intelManagement = new IntelManagement();
-
+    private readonly IntelManagement _intelManagement;
     private MsrPowerLimit _powerLimit;
-    //public List<double> ValidTimeStepsDouble { get; set; } = GenerateValidTimeStepsDouble();
+
+    public event PropertyChangedEventHandler? PropertyChanged;
     public double[] ValidTimeSteps { get; set; } = GenerateValidTimeSteps();
-    public double MinValidTime => ValidTimeSteps?.FirstOrDefault() ?? 0.000;
-    public double MaxValidTime => ValidTimeSteps?.LastOrDefault() ?? 1000;
 
     public MsrPowerLimit PowerLimit
     {
@@ -26,8 +23,15 @@ namespace CpuPowerManagement.ViewModels
 
     public ICommand ApplyPowerLimit1Command { get; }
 
-    public MainViewModel()
+    public PowerLimitViewModel()
     {
+
+    }
+
+    public PowerLimitViewModel(IntelManagement intelManagement)
+    {
+      _intelManagement = intelManagement;
+
       ApplyPowerLimit1Command = new AsyncRelayCommand(ExecuteApplyPowerLimit1CommandAsync);
 
       if (DesignerProperties.GetIsInDesignMode(new DependencyObject()))
@@ -47,7 +51,25 @@ namespace CpuPowerManagement.ViewModels
       PowerLimit = _intelManagement.ReadMsrPowerLimit();
     }
 
-    public event PropertyChangedEventHandler? PropertyChanged;
+    private static double[] GenerateValidTimeSteps()
+    {
+      var steps = new List<double>(); // use HashSet to avoid duplicates
+
+      for (var y = 0; y <= 31; y++)
+      {
+        for (var z = 0; z <= 3; z++)
+        {
+          var time = Math.Pow(2, y) * (1 + z / 4.0) * 1 / 1024;
+
+          if (time > 0 && time < 1000)
+            steps.Add(Math.Round(time, 5));
+        }
+      }
+
+      steps[0] = 0;
+
+      return steps.ToArray();
+    }
 
     protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
     {
@@ -60,26 +82,6 @@ namespace CpuPowerManagement.ViewModels
       field = value;
       OnPropertyChanged(propertyName);
       return true;
-    }
-
-    private static double[] GenerateValidTimeSteps()
-    {
-      var steps = new List<double>(); // use HashSet to avoid duplicates
-
-      for (var y = 0; y <= 31; y++)
-      {
-        for (var z = 0; z <= 3; z++)
-        {
-          var time = Math.Pow(2, y) * (1 + z / 4.0) * 1/1024;
-
-          if (time > 0 && time < 1000)
-            steps.Add(Math.Round(time, 5));
-        }
-      }
-
-      steps[0] = 0;
-
-      return steps.ToArray();
     }
   }
 }

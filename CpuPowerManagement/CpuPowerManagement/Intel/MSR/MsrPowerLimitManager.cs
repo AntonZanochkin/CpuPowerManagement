@@ -43,7 +43,10 @@ namespace CpuPowerManagement.Intel.MSR
       var pl2Enabled = (msrValue & (1UL << 47)) != 0; // Bit 47
       
       var lockedMsr = (msrValue & (1UL << 63)) != 0;
-      // Create and return the PowerLimit object
+
+      var pl1Clamping = (msrValue & (1UL << 16)) != 0; // Bit 16
+      var pl2Clamping = (msrValue & (1UL << 48)) != 0; // Bit 48
+      
       return new MsrPowerLimit
       {
         LockedMsr = lockedMsr,
@@ -52,7 +55,7 @@ namespace CpuPowerManagement.Intel.MSR
         Pl1TimeWindowSec = pl1TimeWindow,
         Pl2TimeWindowSec = pl2TimeWindow,
         Pl1Enabled = pl1Enabled,
-        Pl2Enabled = pl2Enabled
+        Pl2Enabled = pl2Enabled,
       };
     }
 
@@ -70,7 +73,7 @@ namespace CpuPowerManagement.Intel.MSR
       ulong msrValue = 0;
       msrValue |= pl1Limit & 0x7FFF;                 // PL1 Limit (Bits 14:0)
       msrValue |= (limit.Pl1Enabled ? 1UL : 0) << 15;  // PL1 Enable (Bit 15)
-      msrValue |= (limit.Pl1Enabled ? 1UL : 0) << 16;  // PL1 Clamping (Bit 16)
+      msrValue |= (limit.Pl2Enabled ? 1UL : 0) << 16;  // PL1 Clamping (Bit 16)
       msrValue |= ((ulong)encodedTime1 & 0x7F) << 17;   // PL1 Time Window (Bits 23:17)
 
       msrValue |= pl2Limit << 32;                     // PL2 Limit (Bits 46:32)

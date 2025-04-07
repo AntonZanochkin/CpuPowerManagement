@@ -4,7 +4,7 @@
              xmlns:local="clr-namespace:CpuPowerManagement"
              xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
              DispatcherUnhandledException="OnDispatcherUnhandledException"
-             StartupUri="MainWindow.xaml">
+             StartupUri="/Views/Windows/MainWindow.xaml">
             <Application.Resources>
               <ResourceDictionary>
                 <ResourceDictionary.MergedDictionaries>
