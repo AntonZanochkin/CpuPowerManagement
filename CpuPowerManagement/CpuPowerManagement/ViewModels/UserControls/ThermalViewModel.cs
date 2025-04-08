@@ -24,24 +24,24 @@ namespace CpuPowerManagement.ViewModels.UserControls
         OnPropertyChanged(nameof(MaxTtp));
         OnPropertyChanged(nameof(MinTtp));
         OnPropertyChanged(nameof(TargetTemperature));
+        OnPropertyChanged(nameof(TccOffset));
       }
     }
 
-    public int MinTtp
+    public int MinTtp => Tcc.TjMax - 63;
+    public int MaxTtp => Tcc.TjMax;
+
+    public int TccOffset
     {
-      get
+      get => Tcc.TccOffset;
+      set
       {
-        return Tcc.TjMax - 63;
+        Tcc.TccOffset = value;
+        OnPropertyChanged();
+        OnPropertyChanged(nameof(TargetTemperature));
       }
     }
 
-    public int MaxTtp
-    {
-      get
-      {
-        return Tcc.TjMax;
-      }
-    }
 
     private int _targetTemperature;
     public int TargetTemperature
@@ -52,7 +52,7 @@ namespace CpuPowerManagement.ViewModels.UserControls
         Tcc.TccOffset = Tcc.TjMax - value;
 
         SetField(ref _targetTemperature, value);
-        OnPropertyChanged(nameof(Tcc));
+        OnPropertyChanged(nameof(Tcc.TccOffset));
       }
     }
 

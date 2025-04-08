@@ -1,4 +1,6 @@
-﻿using System.Windows.Controls;
+﻿using System.ComponentModel;
+using System.Windows;
+using System.Windows.Controls;
 
 namespace CpuPowerManagement.Views.UserControls
 {
@@ -7,6 +9,9 @@ namespace CpuPowerManagement.Views.UserControls
     public PowerLimitControl()
     {
       InitializeComponent();
+
+      if (!DesignerProperties.GetIsInDesignMode(this))
+        MainCardExpander.IsExpanded = false;
     }
   }
 }
