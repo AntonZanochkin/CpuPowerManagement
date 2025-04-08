@@ -1,5 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
 using CpuPowerManagement.Intel.MSR;
+using CpuPowerManagement.Messages;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows;
@@ -9,42 +11,44 @@ namespace CpuPowerManagement.ViewModels.UserControls
 {
   public class PowerLimitViewModel : INotifyPropertyChanged
   {
-    private readonly IntelManagement _intelManagement;
+    private readonly IntelManagement _intelManagement = new ();
     private MsrPowerLimit _powerLimit;
 
     public event PropertyChangedEventHandler? PropertyChanged;
     public double[] ValidTimeSteps { get; set; } = GenerateValidTimeSteps();
-
     public MsrPowerLimit PowerLimit
     {
       get => _powerLimit;
       set => SetField(ref _powerLimit, value);
     }
-
-    public ICommand ApplyPowerLimit1Command { get; }
+    public ICommand ApplyCommand { get; }
 
     public PowerLimitViewModel()
     {
-
-    }
-
-    public PowerLimitViewModel(IntelManagement intelManagement)
-    {
-      _intelManagement = intelManagement;
-
-      ApplyPowerLimit1Command = new AsyncRelayCommand(ExecuteApplyPowerLimit1CommandAsync);
-
-      if (DesignerProperties.GetIsInDesignMode(new DependencyObject()))
+      if (!DesignerProperties.GetIsInDesignMode(new DependencyObject()))
       {
-        PowerLimit = MsrPowerLimit.CreateMock();
+        WeakReferenceMessenger.Default.Register<UpdatePowerLimit1Message>(this, (r, m) =>
+        {
+          PowerLimit.Pl1Watts = m.Value;
+          OnPropertyChanged(nameof(PowerLimit));
+        });
+
+        PowerLimit = _intelManagement.ReadMsrPowerLimit();
       }
       else
       {
-        PowerLimit = _intelManagement.ReadMsrPowerLimit();
+        PowerLimit = MsrPowerLimit.CreateMock();
       }
+
+      ApplyCommand = new AsyncRelayCommand(ExecuteApplyCommandAsync);
     }
 
-    private async Task ExecuteApplyPowerLimit1CommandAsync()
+    /*private void UpdatePowerLimit()
+    {
+      WeakReferenceMessenger.Default.Send(new UpdateTittleMessage((h++).ToString()));
+    }*/
+
+    private async Task ExecuteApplyCommandAsync()
     {
       _intelManagement.WritePowerLimit(PowerLimit);
       await Task.Delay(1000);

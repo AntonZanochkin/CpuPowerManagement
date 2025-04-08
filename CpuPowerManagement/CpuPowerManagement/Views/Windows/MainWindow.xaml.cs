@@ -1,6 +1,7 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using CpuPowerManagement.Intel.MSR;
 using CpuPowerManagement.ViewModels.Windows;
 
 namespace CpuPowerManagement.Views.Windows
@@ -11,15 +12,11 @@ namespace CpuPowerManagement.Views.Windows
     public MainWindow()
     {
       InitializeComponent();
-
-
     }
 
     private void SizeSlider_TouchDown(object? sender, TouchEventArgs e)
     {
 
     }
-
-   
   }
 }

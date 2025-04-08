@@ -22,7 +22,7 @@ namespace CpuPowerManagement.Intel.MSR
     public MsrPowerLimit ReadPowerLimit()
     {
       var result = RunCli.RunCommand("read 0x610", true, _processMsr);
-      var msrValue = GetMsrValue(result);
+      var msrValue = MsrHelpers.GetMsrValue(result);
       
       // Extract PL1 (Bits 14:0) and convert to watts
       var pl1Raw = (int)(msrValue & 0x7FFF);
@@ -136,18 +136,6 @@ namespace CpuPowerManagement.Intel.MSR
 
       // Convert to uppercase hex string
       return msrValue.ToString("X");
-    }
-
-    private ulong GetMsrValue(string msrOutput)
-    {
-      var regex = new Regex(@"0x(?<reg>[0-9A-Fa-f]+)\s+0x(?<edx>[0-9A-Fa-f]+)\s+0x(?<eax>[0-9A-Fa-f]+)");
-      var match = regex.Match(msrOutput);
-
-      if (!match.Success) return 0; // Return 0 on failures
-
-      var edx = Convert.ToUInt64(match.Groups["edx"].Value, 16);
-      var eax = Convert.ToUInt64(match.Groups["eax"].Value, 16);
-      return (edx << 32) | eax; // Combine EDX and EAX to form a 64-bit MSR value
     }
   }
 }

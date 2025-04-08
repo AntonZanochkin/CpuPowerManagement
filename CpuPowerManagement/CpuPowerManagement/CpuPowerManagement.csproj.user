@@ -10,6 +10,9 @@
     <Compile Update="Views\UserControls\PowerLimitControl.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Update="Views\UserControls\ThermalControl.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Page Update="Views\Windows\MainWindow.xaml">

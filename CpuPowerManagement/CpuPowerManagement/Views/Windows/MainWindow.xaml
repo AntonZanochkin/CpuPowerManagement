@@ -7,19 +7,17 @@
         xmlns:userControls="clr-namespace:CpuPowerManagement.Views.UserControls"
         xmlns:windows="clr-namespace:CpuPowerManagement.ViewModels.Windows"
         mc:Ignorable="d"
+        Title="CPU Power Management"
         Background="{DynamicResource ApplicationBackgroundBrush}"
         Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-        Title="MainWindow" Height="700" Width="800">
+        Height="950" Width="800">
   <Window.DataContext>
     <windows:MainWindowViewModel />
   </Window.DataContext>
-
   <Grid>
-    <StackPanel Margin="10,10,0,3">
-      <userControls:PowerLimitControl
-        MainViewModel="{Binding Mode=OneWay}"
-        ViewModel="{Binding PowerLimitViewModel, Mode=OneWay}" />
-
+    <StackPanel Margin="10,10,0,0">
+      <userControls:ThermalControl/>
+      <userControls:PowerLimitControl/>
     </StackPanel>
   </Grid>
 </Window>
