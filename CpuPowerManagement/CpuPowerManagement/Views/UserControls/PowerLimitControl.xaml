@@ -26,12 +26,12 @@
           </StackPanel>
         </Grid>
       </ui:CardExpander.Header>
-      <StackPanel Height="466">
-        <StackPanel Margin="10,10,0,10" Orientation="Horizontal">
+      <StackPanel Height="380">
+        <StackPanel Margin="10,3,0,3" Orientation="Horizontal">
           <CheckBox Name="PowerLimit1Enabled" Content="Power Limit 1" IsChecked="{Binding PowerLimit.Pl1Enabled}"/>
         </StackPanel>
         <!-- Power Limit 1 Wats  -->
-        <StackPanel Margin="20,10,0,10" IsEnabled="{Binding ElementName=PowerLimit1Enabled, Path= IsChecked}">
+        <StackPanel Margin="20,3,0,3" IsEnabled="{Binding ElementName=PowerLimit1Enabled, Path= IsChecked}">
           <StackPanel Orientation="Horizontal">
             <TextBlock FontWeight="DemiBold" FontSize="13" Foreground="{DynamicResource TextFillColorPrimaryBrush}">Power Limit 1 Wats</TextBlock>
           </StackPanel>
@@ -114,14 +114,14 @@
           </Grid>
         </StackPanel>
         <!-- Power Limit 2 Wats  -->
-        <StackPanel Margin="10,10,0,10" Orientation="Horizontal">
+        <StackPanel Margin="10,3,0,3" Orientation="Horizontal">
           <CheckBox Name="PowerLimit2Enabled"
                    Content="Power Limit 2"
                    IsChecked="{Binding PowerLimit.Pl2Enabled}"/>
         </StackPanel >
         <!-- Power Limit 2 Time Window Sec.-->
         <StackPanel IsEnabled="{Binding ElementName=PowerLimit2Enabled, Path= IsChecked}" 
-                 Margin="20,10,0,10">
+                 Margin="20,3,0,3">
           <Grid Margin="0,8,0,0">
             <Grid.ColumnDefinitions>
               <ColumnDefinition Width="150" />
@@ -161,7 +161,7 @@
           </Grid>
         </StackPanel>
         <!-- Power Limit 2 Time Window Sec.-->
-        <StackPanel IsEnabled="{Binding ElementName=PowerLimit2Enabled, Path= IsChecked}" Margin="20,10,0,10">
+        <StackPanel IsEnabled="{Binding ElementName=PowerLimit2Enabled, Path= IsChecked}" Margin="20,3,0,3">
           <StackPanel Orientation="Horizontal">
             <TextBlock FontWeight="DemiBold" FontSize="13" Foreground="{DynamicResource TextFillColorPrimaryBrush}">Power Limit 2 Time Window Sec.</TextBlock>
           </StackPanel>
@@ -201,8 +201,8 @@
           </Grid>
         </StackPanel>
         <!-- Apply-->
-        <StackPanel Margin="20,10,0,10" HorizontalAlignment="Right">
-          <Button Content="Apply" Command="{Binding ApplyCommand}" Height="40" Width="159"  Margin="0,0,20,0" />
+        <StackPanel Margin="20,3,0,3" HorizontalAlignment="Right">
+          <Button Content="Apply" Command="{Binding ApplyCommand}" Height="30" Width="120"  Margin="0,0,20,0" />
         </StackPanel>
       </StackPanel>
     </ui:CardExpander>

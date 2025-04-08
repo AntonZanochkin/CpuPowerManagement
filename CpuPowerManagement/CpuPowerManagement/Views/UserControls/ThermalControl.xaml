@@ -26,9 +26,9 @@
           </StackPanel>
         </Grid>
       </ui:CardExpander.Header>
-      <StackPanel Height="211">
+      <StackPanel Height="167">
         <!-- Target °C -->
-        <StackPanel Margin="20,10,0,10">
+        <StackPanel Margin="20,3,0,3">
           <StackPanel Orientation="Horizontal">
             <TextBlock FontWeight="DemiBold" FontSize="13" Foreground="{DynamicResource TextFillColorPrimaryBrush}">Thermal Throttle Point °C</TextBlock>
           </StackPanel>
@@ -71,7 +71,7 @@
           </Grid>
         </StackPanel>
         <!-- TccOffset °C  -->
-        <StackPanel Margin="20,10,0,10">
+        <StackPanel Margin="20,3,0,3">
           <StackPanel Orientation="Horizontal">
             <TextBlock FontWeight="DemiBold" FontSize="13" Foreground="{DynamicResource TextFillColorPrimaryBrush}">TccOffset °C</TextBlock>
           </StackPanel>
@@ -116,11 +116,11 @@
           </Grid>
         </StackPanel>
         <!-- Apply-->
-        <StackPanel Margin="20,10,0,10" HorizontalAlignment="Right">
+        <StackPanel Margin="20,3,0,3" HorizontalAlignment="Right">
           <Button Content="Apply" 
                   Command="{Binding ApplyTccOffsetCommand}"
-                  Height="40" 
-                  Width="159"  
+                  Height="30" 
+                  Width="120"  
                   Margin="0,0,20,0" />
         </StackPanel>
       </StackPanel>
