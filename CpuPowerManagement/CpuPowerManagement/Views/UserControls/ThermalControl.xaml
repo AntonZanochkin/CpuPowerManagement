@@ -4,15 +4,17 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:CpuPowerManagement.Views.UserControls"
-             mc:Ignorable="d"
              xmlns:userControls="clr-namespace:CpuPowerManagement.ViewModels.UserControls"
              xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
-             Background="{DynamicResource ApplicationBackgroundBrush}" d:DesignWidth="800" Height="321">
+             Background="{DynamicResource ApplicationBackgroundBrush}"
+             mc:Ignorable="d"
+             d:DesignWidth="700"
+             d:Height="321">
   <UserControl.DataContext>
     <userControls:ThermalViewModel />
   </UserControl.DataContext>
   <Grid VerticalAlignment="Top">
-    <ui:CardExpander Margin="0,0,15,0" VerticalAlignment="Top">
+    <ui:CardExpander Margin="0,0,10,0" VerticalAlignment="Stretch" d:IsExpanded="True">
       <ui:CardExpander.Header>
         <Grid>
           <Grid.ColumnDefinitions>
