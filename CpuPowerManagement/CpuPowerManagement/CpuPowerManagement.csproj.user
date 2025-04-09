@@ -7,6 +7,9 @@
     </ApplicationDefinition>
   </ItemGroup>
   <ItemGroup>
+    <Compile Update="Views\UserControls\CpuStatusControl.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Update="Views\UserControls\PowerLimitControl.xaml.cs">
       <SubType>Code</SubType>
     </Compile>

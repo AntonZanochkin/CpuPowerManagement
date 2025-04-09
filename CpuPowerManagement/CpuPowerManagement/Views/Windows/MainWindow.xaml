@@ -10,16 +10,38 @@
         Title="CPU Power Management"
         Background="{DynamicResource ApplicationBackgroundBrush}"
         Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-        Height="950" Width="800">
+        d:Height="1050" Width="800">
   <Window.DataContext>
     <windows:MainWindowViewModel />
   </Window.DataContext>
   <Grid>
-    <ScrollViewer Margin="0,9,0,0" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" CanContentScroll="False" PanningMode="VerticalFirst" Stylus.IsFlicksEnabled="False" Stylus.IsTouchFeedbackEnabled="True" IsDeferredScrollingEnabled="False">
+    <Grid.RowDefinitions>
+      <RowDefinition Height="*" />
+      <!-- Scrollable content -->
+      <RowDefinition Height="Auto" />
+      <!-- Fixed bottom button -->
+    </Grid.RowDefinitions>
+
+    <!-- Scrollable controls -->
+    <ScrollViewer Grid.Row="0" Margin="0,9,0,0"
+                  HorizontalScrollBarVisibility="Auto"
+                  VerticalScrollBarVisibility="Auto"
+                  CanContentScroll="False"
+                  PanningMode="VerticalFirst"
+                  Stylus.IsFlicksEnabled="False"
+                  Stylus.IsTouchFeedbackEnabled="True"
+                  IsDeferredScrollingEnabled="False">
       <StackPanel Margin="10,10,0,0">
         <userControls:ThermalControl/>
         <userControls:PowerLimitControl/>
+        
       </StackPanel>
     </ScrollViewer>
+
+    <!-- Fixed button below -->
+    <Border Grid.Row="1" Background="{DynamicResource ApplicationBackgroundBrush}" Padding="10">
+      <userControls:CpuStatusControl/>
+    </Border>
   </Grid>
+
 </Window>

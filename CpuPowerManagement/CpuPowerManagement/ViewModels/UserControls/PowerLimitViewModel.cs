@@ -12,14 +12,14 @@ namespace CpuPowerManagement.ViewModels.UserControls
   public class PowerLimitViewModel : INotifyPropertyChanged
   {
     private readonly IntelManagement _intelManagement = new ();
-    private MsrPowerLimit _powerLimit;
+    private MsrPowerLimitData _powerLimitData;
 
     public event PropertyChangedEventHandler? PropertyChanged;
     public double[] ValidTimeSteps { get; set; } = GenerateValidTimeSteps();
-    public MsrPowerLimit PowerLimit
+    public MsrPowerLimitData PowerLimitData
     {
-      get => _powerLimit;
-      set => SetField(ref _powerLimit, value);
+      get => _powerLimitData;
+      set => SetField(ref _powerLimitData, value);
     }
     public ICommand ApplyCommand { get; }
 
@@ -29,15 +29,15 @@ namespace CpuPowerManagement.ViewModels.UserControls
       {
         WeakReferenceMessenger.Default.Register<UpdatePowerLimit1Message>(this, (r, m) =>
         {
-          PowerLimit.Pl1Watts = m.Value;
-          OnPropertyChanged(nameof(PowerLimit));
+          PowerLimitData.Pl1Watts = m.Value;
+          OnPropertyChanged(nameof(PowerLimitData));
         });
 
-        PowerLimit = _intelManagement.ReadMsrPowerLimit();
+        PowerLimitData = _intelManagement.ReadMsrPowerLimitData();
       }
       else
       {
-        PowerLimit = MsrPowerLimit.CreateMock();
+        PowerLimitData = MsrPowerLimitData.CreateMock();
       }
 
       ApplyCommand = new AsyncRelayCommand(ExecuteApplyCommandAsync);
@@ -50,9 +50,9 @@ namespace CpuPowerManagement.ViewModels.UserControls
 
     private async Task ExecuteApplyCommandAsync()
     {
-      _intelManagement.WritePowerLimit(PowerLimit);
+      _intelManagement.WritePowerLimitData(PowerLimitData);
       await Task.Delay(1000);
-      PowerLimit = _intelManagement.ReadMsrPowerLimit();
+      PowerLimitData = _intelManagement.ReadMsrPowerLimitData();
     }
 
     private static double[] GenerateValidTimeSteps()

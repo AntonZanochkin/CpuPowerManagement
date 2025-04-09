@@ -28,7 +28,7 @@
       </ui:CardExpander.Header>
       <StackPanel Height="380">
         <StackPanel Margin="10,3,0,3" Orientation="Horizontal">
-          <CheckBox Name="PowerLimit1Enabled" Content="Power Limit 1" IsChecked="{Binding PowerLimit.Pl1Enabled}"/>
+          <CheckBox Name="PowerLimit1Enabled" Content="Power Limit 1" IsChecked="{Binding PowerLimitData.Pl1Enabled}"/>
         </StackPanel>
         <!-- Power Limit 1 Wats  -->
         <StackPanel Margin="20,3,0,3" IsEnabled="{Binding ElementName=PowerLimit1Enabled, Path= IsChecked}">
@@ -45,7 +45,7 @@
             </Grid.ColumnDefinitions>
 
             <ui:NumberBox Name="Pl1WattsNumberBox"
-                          Value="{Binding PowerLimit.Pl1Watts, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                          Value="{Binding PowerLimitData.Pl1Watts, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                           Minimum="5" Maximum="105"
                           Grid.Column="0" 
                           SmallChange="1" 
@@ -58,7 +58,7 @@
                     Grid.Column="1" Margin="10,0,0,0"/>
 
             <Slider Name="SliderPowerLimit1Wats"
-                    Value="{Binding PowerLimit.Pl1Watts}"
+                    Value="{Binding PowerLimitData.Pl1Watts}"
                     Minimum="{Binding ElementName=Pl1WattsNumberBox, Path=Minimum}"
                     Maximum="{Binding ElementName=Pl1WattsNumberBox, Path=Maximum}"
                     Grid.Column="2" Margin="5,0,0,0" 
@@ -89,7 +89,7 @@
 
             <ComboBox Name="Pl1TimeWindowSecComboBox"
                       ItemsSource="{Binding ValidTimeSteps}"
-                      SelectedItem="{Binding PowerLimit.Pl1TimeWindowSec, Mode=TwoWay}" 
+                      SelectedItem="{Binding PowerLimitData.Pl1TimeWindowSec, Mode=TwoWay}" 
                       Grid.Column="0"/>
 
             <TextBlock Text="{Binding ElementName=SliderPl1TimeWindowSec, Path=MinimumValue}" 
@@ -100,7 +100,7 @@
 
             <components:DiscreteValueSlider x:Name="SliderPl1TimeWindowSec"
                                             AllowedValues="{Binding ValidTimeSteps}"
-                                            SelectedRealValue="{Binding PowerLimit.Pl1TimeWindowSec, Mode=TwoWay}"
+                                            SelectedRealValue="{Binding PowerLimitData.Pl1TimeWindowSec, Mode=TwoWay}"
                                             VerticalAlignment="Center"
                                             Grid.Column="2" Margin="5,0,0,0">
             </components:DiscreteValueSlider>
@@ -117,7 +117,7 @@
         <StackPanel Margin="10,3,0,3" Orientation="Horizontal">
           <CheckBox Name="PowerLimit2Enabled"
                    Content="Power Limit 2"
-                   IsChecked="{Binding PowerLimit.Pl2Enabled}"/>
+                   IsChecked="{Binding PowerLimitData.Pl2Enabled}"/>
         </StackPanel >
         <!-- Power Limit 2 Time Window Sec.-->
         <StackPanel IsEnabled="{Binding ElementName=PowerLimit2Enabled, Path= IsChecked}" 
@@ -132,7 +132,7 @@
             </Grid.ColumnDefinitions>
 
             <ui:NumberBox Name="Pl2WattsNumberBox" 
-                          Value="{Binding PowerLimit.Pl2Watts, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                          Value="{Binding PowerLimitData.Pl2Watts, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
                           Minimum="10" 
                           Maximum="105" 
                           Grid.Column="0" 
@@ -146,7 +146,7 @@
                     Grid.Column="1" Margin="10,0,0,0"/>
 
             <Slider Name="SliderPowerLimit2Wats" 
-                    Value="{Binding PowerLimit.Pl2Watts}" 
+                    Value="{Binding PowerLimitData.Pl2Watts}" 
                     Minimum="{Binding ElementName=Pl2WattsNumberBox, Path=Minimum}" 
                     Maximum="{Binding ElementName=Pl2WattsNumberBox, Path=Maximum}"
                     Grid.Column="2" Margin="5,0,0,0" 
@@ -176,7 +176,7 @@
 
             <ComboBox Name="Pl2TimeWindowSecComboBox"
                       ItemsSource="{Binding ValidTimeSteps}"
-                      SelectedItem="{Binding PowerLimit.Pl2TimeWindowSec, Mode=TwoWay}" 
+                      SelectedItem="{Binding PowerLimitData.Pl2TimeWindowSec, Mode=TwoWay}" 
                       Grid.Column="0"/>
 
             <TextBlock Text="{Binding ElementName=SliderPl2TimeWindowSec, Path=MinimumValue}" 
@@ -188,7 +188,7 @@
 
             <components:DiscreteValueSlider x:Name="SliderPl2TimeWindowSec"
                                             AllowedValues="{Binding ValidTimeSteps}"
-                                            SelectedRealValue="{Binding PowerLimit.Pl2TimeWindowSec, Mode=TwoWay}"
+                                            SelectedRealValue="{Binding PowerLimitData.Pl2TimeWindowSec, Mode=TwoWay}"
                                             VerticalAlignment="Center"
                                             Grid.Column="2" Margin="5,0,0,0">
             </components:DiscreteValueSlider>

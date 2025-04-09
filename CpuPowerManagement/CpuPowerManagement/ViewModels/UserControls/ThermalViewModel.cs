@@ -4,6 +4,7 @@ using System.Runtime.CompilerServices;
 using System.Windows.Input;
 using CommunityToolkit.Mvvm.Input;
 using System.Windows;
+using static CpuPowerManagement.Intel.MSR.MsrTccManager;
 
 namespace CpuPowerManagement.ViewModels.UserControls
 {
@@ -14,8 +15,8 @@ namespace CpuPowerManagement.ViewModels.UserControls
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
-    private MsrTcc _tcc;
-    public MsrTcc Tcc
+    private MsrTccData _tcc;
+    public MsrTccData Tcc
     {
       get => _tcc;
       set
@@ -61,16 +62,16 @@ namespace CpuPowerManagement.ViewModels.UserControls
       ApplyTccOffsetCommand = new AsyncRelayCommand(ExecuteApplyCommandAsync);
 
       if (DesignerProperties.GetIsInDesignMode(new DependencyObject()))
-        Tcc = MsrTcc.CreateMock();
+        Tcc = MsrTccData.CreateMock();
       else
-        Tcc = _intelManagement.ReadTccOffset();
+        Tcc = _intelManagement.ReadTccOffsetData();
     }
 
     private async Task ExecuteApplyCommandAsync()
     {
-      _intelManagement.WriteTccOffset(_tcc);
+      _intelManagement.WriteTccOffsetData(_tcc);
       await Task.Delay(1000);
-      Tcc = _intelManagement.ReadTccOffset();
+      Tcc = _intelManagement.ReadTccOffsetData();
     }
 
     protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)

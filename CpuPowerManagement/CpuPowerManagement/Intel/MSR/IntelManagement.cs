@@ -1,41 +1,57 @@
 ﻿using System.IO;
 using System.Reflection;
+using static CpuPowerManagement.Intel.MSR.MsrCoreThermal;
+using static CpuPowerManagement.Intel.MSR.MsrTccManager;
 
 namespace CpuPowerManagement.Intel.MSR
 {
   public class IntelManagement
   {
     readonly MsrPowerLimitManager _powerLimitManager;
-    readonly MsrTccManager _msrThermalTargetManager;
+    readonly MsrTccManager _msrThermalTarget;
+    readonly MsrPackageThermal _msrPackageThermal;
+    readonly MsrCoreThermal _msrCoreThermal;
 
     public IntelManagement()
     {
       var folderPath = Path.GetDirectoryName(Assembly.GetEntryAssembly()?.Location) ?? string.Empty;
       var processMsr = Path.Combine(folderPath, "Assets\\Intel\\MSR\\msr-cmd.exe");
-      var powerMultiplierManager = new MsrPowerMultiplierManager(processMsr);
-      var powerMultiplier = powerMultiplierManager.ReadPowerMultiplier();
-      _powerLimitManager = new MsrPowerLimitManager(processMsr, powerMultiplier);
-      _msrThermalTargetManager = new MsrTccManager(processMsr);
+      var powerMultiplier = new MsrPowerMultiplier(processMsr);
+      var powerMultiplierInfo = powerMultiplier.ReadPowerMultiplier();
+      _powerLimitManager = new MsrPowerLimitManager(processMsr, powerMultiplierInfo);
+      _msrThermalTarget = new MsrTccManager(processMsr);
+      _msrPackageThermal = new MsrPackageThermal(processMsr);
+      _msrCoreThermal = new MsrCoreThermal(processMsr);
     }
 
-    public MsrPowerLimit ReadMsrPowerLimit()
+    public MsrPowerLimitData ReadMsrPowerLimitData()
     {
-      return _powerLimitManager.ReadPowerLimit();
+      return _powerLimitManager.ReadPowerLimitData();
     }
 
-    public void WritePowerLimit(MsrPowerLimit limit)
+    public void WritePowerLimitData(MsrPowerLimitData limitData)
     {
-      _powerLimitManager.WritePowerLimit(limit);
+      _powerLimitManager.WritePowerLimit(limitData);
     }
 
-    public MsrTcc ReadTccOffset()
+    public MsrTccData ReadTccOffsetData()
     {
-      return _msrThermalTargetManager.ReadTcc();
+      return _msrThermalTarget.ReadTccData();
     }
 
-    public void WriteTccOffset(MsrTcc tcc)
+    public void WriteTccOffsetData(MsrTccData tcc)
     {
-      _msrThermalTargetManager.WriteTccOffset(tcc.TccOffset);
+      _msrThermalTarget.WriteTccOffset(tcc.TccOffset);
+    }
+
+    public MsrCoreThermalData ReadCoreThermalData()
+    {
+      return _msrCoreThermal.ReadCoreThermalInfo();
+    }
+
+    public MsrPackageThermal.MsrPackageThermalData ReadPackageThermalData()
+    {
+      return _msrPackageThermal.ReadPackageThermalData();
     }
   }
 }

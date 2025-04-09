@@ -3,9 +3,9 @@ using CpuPowerManagement.Intel.MSR;
 
 namespace CpuPowerManagement.Messages
 {
-  public class UpdatePowerLimitMessage : ValueChangedMessage<MsrPowerLimit>
+  public class UpdatePowerLimitMessage : ValueChangedMessage<MsrPowerLimitData>
   {
-    public UpdatePowerLimitMessage(MsrPowerLimit value) : base(value) { }
+    public UpdatePowerLimitMessage(MsrPowerLimitData value) : base(value) { }
   }
 
   public class UpdatePowerLimit1Message : ValueChangedMessage<int>
