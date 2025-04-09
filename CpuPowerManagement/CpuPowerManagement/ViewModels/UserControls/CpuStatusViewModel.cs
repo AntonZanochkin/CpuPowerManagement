@@ -22,21 +22,21 @@ namespace CpuPowerManagement.ViewModels.UserControls
     private readonly DispatcherTimer _timer;
     private int _time = 0;
 
-    private MsrCoreThermal.MsrCoreThermalData _coreThermalData;
+    //private MsrCoreThermal.MsrCoreThermalData _coreThermalData;
     private MsrPackageThermal.MsrPackageThermalData _packageThermalData;
 
-    public ChartValues<int> CoreThermalPoints { get; set; } = new();
-    public ChartValues<int> PackagePowerPoints { get; set; } = new();
+    public ChartValues<int> ThermalThrottlePoints { get; set; } = new();
+    public ChartValues<int> PackageThrottlePoints { get; set; } = new();
 
     public ObservableCollection<string> Labels { get; set; } = new();
 
     public SeriesCollection Series { get; set; }
 
-    public MsrCoreThermal.MsrCoreThermalData CoreThermalData
-    {
-      get => _coreThermalData;
-      set => SetField(ref _coreThermalData, value);
-    }
+    //public MsrCoreThermal.MsrCoreThermalData CoreThermalData
+    //{
+    //  get => _coreThermalData;
+    //  set => SetField(ref _coreThermalData, value);
+    //}
 
     public MsrPackageThermal.MsrPackageThermalData PackageThermalData
     {
@@ -57,13 +57,13 @@ namespace CpuPowerManagement.ViewModels.UserControls
         {
           new LineSeries
           {
-            Title = "Core Throttle",
-            Values = CoreThermalPoints
+            Title = "Thermal Throttle",
+            Values = ThermalThrottlePoints
           },
           new LineSeries
           {
-            Title = "Package Power Limit",
-            Values = PackagePowerPoints
+            Title = "Package Throttle",
+            Values = PackageThrottlePoints
           }
         };
 
@@ -75,19 +75,19 @@ namespace CpuPowerManagement.ViewModels.UserControls
 
     private void Tick()
     {
-      CoreThermalData = _intelManagement.ReadCoreThermalData();
+      //CoreThermalData = _intelManagement.ReadCoreThermalData();
       PackageThermalData = _intelManagement.ReadPackageThermalData();
 
-      CoreThermalPoints.Add(CoreThermalData.ThermalStatus ? 1 : 0);
-      PackagePowerPoints.Add(PackageThermalData.PowerLimitStatus ? 1 : 0);
+      ThermalThrottlePoints.Add(PackageThermalData.ThermalStatus ? 1 : 0);
+      PackageThrottlePoints.Add(PackageThermalData.PowerLimitStatus ? 1 : 0);
 
       Labels.Add(_time.ToString());
       _time++;
 
-      if (CoreThermalPoints.Count > 60)
+      if (ThermalThrottlePoints.Count > 60)
       {
-        CoreThermalPoints.RemoveAt(0);
-        PackagePowerPoints.RemoveAt(0);
+        ThermalThrottlePoints.RemoveAt(0);
+        PackageThrottlePoints.RemoveAt(0);
         Labels.RemoveAt(0);
       }
     }

@@ -44,10 +44,10 @@ namespace CpuPowerManagement.Intel.MSR
       _msrThermalTarget.WriteTccOffset(tcc.TccOffset);
     }
 
-    public MsrCoreThermalData ReadCoreThermalData()
-    {
-      return _msrCoreThermal.ReadCoreThermalInfo();
-    }
+    //public MsrCoreThermalData ReadCoreThermalData()
+    //{
+    //  return _msrCoreThermal.ReadCoreThermalInfo();
+    //}
 
     public MsrPackageThermal.MsrPackageThermalData ReadPackageThermalData()
     {

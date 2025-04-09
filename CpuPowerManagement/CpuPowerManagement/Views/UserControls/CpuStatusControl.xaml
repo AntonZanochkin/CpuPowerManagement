@@ -30,15 +30,15 @@
       <ColumnDefinition Width="Auto"/>
     </Grid.ColumnDefinitions>
 
-    <!-- Core Thermal Status -->
-    <TextBlock Grid.Row="0" Grid.Column="0" Text="Core Thermal Status:" VerticalAlignment="Center"/>
-    <Ellipse Grid.Row="0" Grid.Column="1" Width="16" Height="16" Margin="5,0"
-             Fill="{Binding CoreThermalData.ThermalStatus, Converter={StaticResource BoolToBrushConverter}}"
+      <!-- Thermal Throttle -->
+      <TextBlock Grid.Row="0" Grid.Column="0" Text="Thermal Throttle:" VerticalAlignment="Center"/>
+      <Ellipse Grid.Row="0" Grid.Column="1" Width="16" Height="16" Margin="5,0"
+             Fill="{Binding PackageThermalData.ThermalStatus, Converter={StaticResource BoolToBrushConverter}}"
              Stroke="Black" StrokeThickness="1"/>
 
-    <!-- Package Power Limit Status -->
-    <TextBlock Grid.Row="1" Grid.Column="0" Text="Package Power Limit Status:" VerticalAlignment="Center"/>
-    <Ellipse Grid.Row="1" Grid.Column="1" Width="16" Height="16" Margin="5,0"
+      <!-- Package Throttle -->
+      <TextBlock Grid.Row="1" Grid.Column="0" Text="Package Throttle:" VerticalAlignment="Center"/>
+      <Ellipse Grid.Row="1" Grid.Column="1" Width="16" Height="16" Margin="5,0"
              Fill="{Binding PackageThermalData.PowerLimitStatus, Converter={StaticResource BoolToBrushConverter}}"
              Stroke="Black" StrokeThickness="1"/>
   </Grid>

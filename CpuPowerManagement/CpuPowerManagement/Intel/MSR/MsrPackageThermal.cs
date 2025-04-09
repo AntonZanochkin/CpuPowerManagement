@@ -15,8 +15,8 @@ namespace CpuPowerManagement.Intel.MSR
         RawValue = msrValue,
         ThermalStatus = (eax & (1 << 0)) != 0,
         ThermalLog = (eax & (1 << 1)) != 0,
-        PROCHOT = (eax & (1 << 2)) != 0,
-        PROCHOTLog = (eax & (1 << 3)) != 0,
+        Prochot = (eax & (1 << 2)) != 0,
+        ProchotLog = (eax & (1 << 3)) != 0,
         CriticalTemperature = (eax & (1 << 4)) != 0,
         CriticalTemperatureLog = (eax & (1 << 5)) != 0,
         PowerLimitStatus = (eax & (1 << 10)) != 0,
@@ -29,8 +29,8 @@ namespace CpuPowerManagement.Intel.MSR
       public ulong RawValue { get; set; }
       public bool ThermalStatus { get; set; }
       public bool ThermalLog { get; set; }
-      public bool PROCHOT { get; set; }
-      public bool PROCHOTLog { get; set; }
+      public bool Prochot { get; set; }
+      public bool ProchotLog { get; set; }
       public bool CriticalTemperature { get; set; }
       public bool CriticalTemperatureLog { get; set; }
       public bool PowerLimitStatus { get; set; }
