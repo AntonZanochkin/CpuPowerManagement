@@ -25,6 +25,22 @@ namespace CpuPowerManagement.Intel.MSR
       };
     }
 
+    public int ReadCurrentTemperature(int tjMax)
+    {
+      var result = RunCli.RunCommand("read 0x19C", true, processMsr);
+      var msrValue = MsrHelpers.GetMsrValue(result);
+      var eax = (uint)(msrValue & 0xFFFFFFFF);
+
+      if ((eax & (1 << 31)) == 0)
+      {
+        // Reading is invalid
+        return -1;
+      }
+
+      var digitalReadout = (int)((eax >> 16) & 0x7F);
+      return tjMax - digitalReadout;
+    }
+
     public class MsrCoreThermalData
     {
       public ulong RawValue { get; set; }

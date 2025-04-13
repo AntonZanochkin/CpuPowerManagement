@@ -1,14 +1,9 @@
-﻿using CommunityToolkit.Mvvm.Input;
-using CpuPowerManagement.Intel.MSR;
-using System;
-using System.Collections.Generic;
+﻿using CpuPowerManagement.Intel.MSR;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Media;
 using System.Windows.Threading;
 using LiveCharts;
 using LiveCharts.Wpf;
@@ -27,6 +22,7 @@ namespace CpuPowerManagement.ViewModels.UserControls
 
     public ChartValues<int> ThermalThrottlePoints { get; set; } = new();
     public ChartValues<int> PackageThrottlePoints { get; set; } = new();
+    public ChartValues<int> CpuTemperaturePoints { get; set; } = new();
 
     public ObservableCollection<string> Labels { get; set; } = new();
 
@@ -58,14 +54,26 @@ namespace CpuPowerManagement.ViewModels.UserControls
           new LineSeries
           {
             Title = "Thermal Throttle",
-            Values = ThermalThrottlePoints
+            Values = ThermalThrottlePoints,
+            Stroke = Brushes.Orange,
+            Fill = Brushes.Transparent
           },
           new LineSeries
           {
             Title = "Package Throttle",
-            Values = PackageThrottlePoints
+            Values = PackageThrottlePoints,
+            Stroke = Brushes.Blue,
+            Fill = Brushes.Transparent
+          },
+          new LineSeries
+          {
+            Title = "Cpu \u00b0C",
+            Values = CpuTemperaturePoints,
+            Stroke = Brushes.Red,
+            Fill = Brushes.Transparent
           }
         };
+
 
         _timer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
         _timer.Tick += (s, e) => Tick();
@@ -77,9 +85,11 @@ namespace CpuPowerManagement.ViewModels.UserControls
     {
       //CoreThermalData = _intelManagement.ReadCoreThermalData();
       PackageThermalData = _intelManagement.ReadPackageThermalData();
+      var currentTemperature = _intelManagement.ReadCurrentTemperature();
 
-      ThermalThrottlePoints.Add(PackageThermalData.ThermalStatus ? 1 : 0);
-      PackageThrottlePoints.Add(PackageThermalData.PowerLimitStatus ? 1 : 0);
+      ThermalThrottlePoints.Add(PackageThermalData.ThermalStatus ? _intelManagement.TjMax : 0);
+      PackageThrottlePoints.Add(PackageThermalData.PowerLimitStatus ? _intelManagement.TjMax : 0);
+      CpuTemperaturePoints.Add(currentTemperature);
 
       Labels.Add(_time.ToString());
       _time++;
@@ -88,6 +98,7 @@ namespace CpuPowerManagement.ViewModels.UserControls
       {
         ThermalThrottlePoints.RemoveAt(0);
         PackageThrottlePoints.RemoveAt(0);
+        CpuTemperaturePoints.RemoveAt(0);
         Labels.RemoveAt(0);
       }
     }

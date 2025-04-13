@@ -4,7 +4,7 @@ using System.Runtime.CompilerServices;
 using System.Windows.Input;
 using CommunityToolkit.Mvvm.Input;
 using System.Windows;
-using static CpuPowerManagement.Intel.MSR.MsrTccManager;
+using static CpuPowerManagement.Intel.MSR.MsrTcc;
 
 namespace CpuPowerManagement.ViewModels.UserControls
 {

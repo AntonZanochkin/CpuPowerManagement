@@ -2,7 +2,7 @@
 
 namespace CpuPowerManagement.Intel.MSR
 {
-  public class MsrPowerLimitManager(string processMsr, MsrPowerMultiplierData msrPowerMultiplierData)
+  public class MsrPowerLimit(string processMsr, MsrPowerMultiplierData msrPowerMultiplierData)
   {
     public MsrPowerLimitData ReadPowerLimitData()
     {

@@ -17,6 +17,7 @@
   </UserControl.DataContext>
   <UserControl.Resources>
     <converters:BoolToBrushConverter x:Key="BoolToBrushConverter"/>
+    <local:CustomTooltip x:Key="BlackTooltip"/>
   </UserControl.Resources>
   <StackPanel Orientation="Vertical">
     <Grid Margin="20">
@@ -44,12 +45,13 @@
   </Grid>
 
     <Grid Height="150">
-      <wpf:CartesianChart Series="{Binding Series}" LegendLocation="Right" Margin="0,0,0,0">
+      <wpf:CartesianChart Series="{Binding Series}" LegendLocation="Right" DisableAnimations="True"
+                          DataTooltip="{StaticResource BlackTooltip}">
         <wpf:CartesianChart.AxisX>
           <wpf:Axis Title="Time (s)" Labels="{Binding Labels}" />
         </wpf:CartesianChart.AxisX>
         <wpf:CartesianChart.AxisY>
-          <wpf:Axis Title="Status (1=Throttling, 0=OK)" MinValue="0" MaxValue="1"/>
+          <wpf:Axis Title="Status" MinValue="0" MaxValue="100" />
         </wpf:CartesianChart.AxisY>
       </wpf:CartesianChart>
     </Grid>

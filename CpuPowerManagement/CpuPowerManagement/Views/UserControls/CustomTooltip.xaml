@@ -1,0 +1,11 @@
+﻿<UserControl x:Class="CpuPowerManagement.Views.UserControls.CustomTooltip"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:lvc="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             Background="Transparent">
+  <Border Background="Black" Padding="6" CornerRadius="4" BorderBrush="White" BorderThickness="1">
+    <lvc:DefaultTooltip x:Name="InnerTooltip"
+                        Foreground="White"
+                        Background="Black" />
+  </Border>
+</UserControl>

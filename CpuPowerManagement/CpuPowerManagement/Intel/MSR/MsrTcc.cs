@@ -3,18 +3,11 @@ using System.Text.RegularExpressions;
 
 namespace CpuPowerManagement.Intel.MSR
 {
-  public class MsrTccManager
+  public class MsrTcc(string processMsr)
   {
-    private readonly string _processMsr;
-
-    public MsrTccManager(string processMsr)
-    {
-      _processMsr = processMsr;
-    }
-
     public MsrTccData ReadTccData()
     {
-      var result = RunCli.RunCommand("read 0x1A2", true, _processMsr);
+      var result = RunCli.RunCommand("read 0x1A2", true, processMsr);
       var msrValue = MsrHelpers.GetMsrValue(result);
       var eax = (uint)(msrValue & 0xFFFFFFFF);
 
@@ -35,7 +28,7 @@ namespace CpuPowerManagement.Intel.MSR
         throw new ArgumentOutOfRangeException(nameof(offset), "Offset must be between 0 and 63");
 
       // Read existing value
-      var result = RunCli.RunCommand("read 0x1A2", true, _processMsr);
+      var result = RunCli.RunCommand("read 0x1A2", true, processMsr);
       var msrValue = MsrHelpers.GetMsrValue(result);
 
       // Clear bits [29:24]
@@ -49,7 +42,7 @@ namespace CpuPowerManagement.Intel.MSR
 
       // Write to MSR
       var commandArguments = $"-s write 0x1A2 0x{hexMsr.Substring(0, 8)} 0x{hexMsr.Substring(8, 8)}";
-      RunCli.RunCommand(commandArguments, false, _processMsr);
+      RunCli.RunCommand(commandArguments, false, processMsr);
     }
 
     public class MsrTccData
