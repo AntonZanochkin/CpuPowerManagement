@@ -1,6 +1,7 @@
 ﻿using System.IO;
 using System.Reflection;
 using static CpuPowerManagement.Intel.MSR.MsrCoreThermal;
+using static CpuPowerManagement.Intel.MSR.MsrPackagePower;
 using static CpuPowerManagement.Intel.MSR.MsrTcc;
 
 namespace CpuPowerManagement.Intel.MSR
@@ -11,6 +12,7 @@ namespace CpuPowerManagement.Intel.MSR
     readonly MsrTcc _msrTcc;
     readonly MsrPackageThermal _msrPackageThermal;
     readonly MsrCoreThermal _msrCoreThermal;
+    readonly MsrPackagePower _msrPackagePower;
 
     private int? _tjMax;
 
@@ -33,6 +35,7 @@ namespace CpuPowerManagement.Intel.MSR
       _msrTcc = new MsrTcc(processMsr);
       _msrPackageThermal = new MsrPackageThermal(processMsr);
       _msrCoreThermal = new MsrCoreThermal(processMsr);
+      _msrPackagePower = new MsrPackagePower(processMsr);
     }
 
     public MsrPowerLimitData ReadMsrPowerLimitData()
@@ -63,6 +66,11 @@ namespace CpuPowerManagement.Intel.MSR
     public MsrPackageThermal.MsrPackageThermalData ReadPackageThermalData()
     {
       return _msrPackageThermal.ReadPackageThermalData();
+    }
+
+    public Task<PackagePowerData> ReadPackagePowerAsync()
+    {
+      return _msrPackagePower.ReadPackagePowerAsync();
     }
   }
 }

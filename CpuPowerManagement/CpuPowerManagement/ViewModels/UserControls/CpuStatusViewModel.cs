@@ -40,52 +40,84 @@ namespace CpuPowerManagement.ViewModels.UserControls
       set => SetField(ref _packageThermalData, value);
     }
 
+    private Brush _thermalThrottleTextBrush = Brushes.Gray;
+    public Brush ThermalThrottleTextBrush
+    {
+      get => _thermalThrottleTextBrush;
+      set => SetField(ref _thermalThrottleTextBrush, value);
+    }
+
+    private string _cpuTemperatureText = "CPU: 50 °C";
+    public string CpuTemperatureText
+    {
+      get => _cpuTemperatureText;
+      set => SetField(ref _cpuTemperatureText, value);
+    }
+
+    private Brush _packageThrottleTextBrush = Brushes.Gray;
+    public Brush PackageThrottleTextBrush
+    {
+      get => _packageThrottleTextBrush;
+      set => SetField(ref _packageThrottleTextBrush, value);
+    }
+
+    private string _tpdText = "TPD: 50 W";
+    public string TpdText
+    {
+      get => _tpdText;
+      set => SetField(ref _tpdText, value);
+    }
+
+    // private string _cpuTemperatureText = "Cpu: 50 °C";
+    // public string CpuTemperatureText
+    // {
+    //   get => _cpuTemperatureText;
+    //   set => SetField(ref _cpuTemperatureText, value);
+    // }
+
+
     public CpuStatusViewModel()
     {
       if (DesignerProperties.GetIsInDesignMode(new DependencyObject()))
-      {
-        //Tcc = MsrTcc.CreateMock();
+        return;
 
-      }
-      else
-      {
-        Series = new SeriesCollection
+      Series = new SeriesCollection
+      { 
+        new LineSeries
         {
-          new LineSeries
-          {
-            Title = "Thermal Throttle",
-            Values = ThermalThrottlePoints,
-            Stroke = Brushes.Orange,
-            Fill = Brushes.Transparent
-          },
-          new LineSeries
-          {
-            Title = "Package Throttle",
-            Values = PackageThrottlePoints,
-            Stroke = Brushes.Blue,
-            Fill = Brushes.Transparent
-          },
-          new LineSeries
-          {
-            Title = "Cpu \u00b0C",
-            Values = CpuTemperaturePoints,
-            Stroke = Brushes.Red,
-            Fill = Brushes.Transparent
-          }
-        };
+          Title = "Cpu \u00b0C",
+          Values = CpuTemperaturePoints,
+          Stroke = Brushes.Red,
+          Fill = Brushes.Transparent
+        },
+        new LineSeries
+        {
+          Title = "Thermal Throttle",
+          Values = ThermalThrottlePoints,
+          Stroke = Brushes.DarkOrange,
+          Fill = Brushes.Transparent
+        },
+        new LineSeries
+        {
+          Title = "Package Throttle",
+          Values = PackageThrottlePoints,
+          Stroke = Brushes.DeepSkyBlue,
+          Fill = Brushes.Transparent
+        }
+      };
 
 
-        _timer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
-        _timer.Tick += (s, e) => Tick();
-        _timer.Start();
-      }
+      _timer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
+      _timer.Tick += (s, e) => _ = Tick();
+      _timer.Start();
     }
 
-    private void Tick()
+    private async Task Tick()
     {
       //CoreThermalData = _intelManagement.ReadCoreThermalData();
       PackageThermalData = _intelManagement.ReadPackageThermalData();
       var currentTemperature = _intelManagement.ReadCurrentTemperature();
+      var packagePowerData = await _intelManagement.ReadPackagePowerAsync();
 
       ThermalThrottlePoints.Add(PackageThermalData.ThermalStatus ? _intelManagement.TjMax : 0);
       PackageThrottlePoints.Add(PackageThermalData.PowerLimitStatus ? _intelManagement.TjMax : 0);
@@ -101,6 +133,13 @@ namespace CpuPowerManagement.ViewModels.UserControls
         CpuTemperaturePoints.RemoveAt(0);
         Labels.RemoveAt(0);
       }
+
+      ThermalThrottleTextBrush = PackageThermalData.ThermalStatus ? Brushes.DarkOrange : Brushes.Gray;
+      CpuTemperatureText = $"CPU: { currentTemperature} °C";
+
+      PackageThrottleTextBrush = PackageThermalData.PowerLimitStatus ? Brushes.DeepSkyBlue : Brushes.Gray;
+
+      TpdText = $"TPD: {double.Round(packagePowerData.PowerWatts, MidpointRounding.ToZero) } W";
     }
 
     protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)

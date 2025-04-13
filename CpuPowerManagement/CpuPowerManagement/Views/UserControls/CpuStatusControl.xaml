@@ -27,21 +27,18 @@
       <RowDefinition Height="Auto"/>
     </Grid.RowDefinitions>
     <Grid.ColumnDefinitions>
-      <ColumnDefinition Width="200"/>
+      <ColumnDefinition Width="150"/>
       <ColumnDefinition Width="Auto"/>
     </Grid.ColumnDefinitions>
 
       <!-- Thermal Throttle -->
-      <TextBlock Grid.Row="0" Grid.Column="0" Text="Thermal Throttle:" VerticalAlignment="Center"/>
-      <Ellipse Grid.Row="0" Grid.Column="1" Width="16" Height="16" Margin="5,0"
-             Fill="{Binding PackageThermalData.ThermalStatus, Converter={StaticResource BoolToBrushConverter}}"
-             Stroke="Black" StrokeThickness="1"/>
+      <TextBlock Grid.Row="0" Grid.Column="0" Text="Thermal Throttle" VerticalAlignment="Center" Foreground="{Binding ThermalThrottleTextBrush}"/>
+      <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding CpuTemperatureText}" VerticalAlignment="Center"/>
 
       <!-- Package Throttle -->
-      <TextBlock Grid.Row="1" Grid.Column="0" Text="Package Throttle:" VerticalAlignment="Center"/>
-      <Ellipse Grid.Row="1" Grid.Column="1" Width="16" Height="16" Margin="5,0"
-             Fill="{Binding PackageThermalData.PowerLimitStatus, Converter={StaticResource BoolToBrushConverter}}"
-             Stroke="Black" StrokeThickness="1"/>
+      <TextBlock Grid.Row="1" Grid.Column="0" Text="Package Throttle" VerticalAlignment="Center" Foreground="{Binding PackageThrottleTextBrush}"/>
+      <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding TpdText}" VerticalAlignment="Center"/>
+     
   </Grid>
 
     <Grid Height="150">
