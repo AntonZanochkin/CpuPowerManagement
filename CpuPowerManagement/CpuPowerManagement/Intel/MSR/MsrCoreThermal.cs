@@ -25,7 +25,7 @@ namespace CpuPowerManagement.Intel.MSR
       };
     }
 
-    public int ReadCurrentTemperature(int tjMax)
+    public int ReadThermalStatusReadout()
     {
       var result = RunCli.RunCommand("read 0x19C", true, processMsr);
       var msrValue = MsrHelpers.GetMsrValue(result);
@@ -37,8 +37,8 @@ namespace CpuPowerManagement.Intel.MSR
         return -1;
       }
 
-      var digitalReadout = (int)((eax >> 16) & 0x7F);
-      return tjMax - digitalReadout;
+      var tjMaxDelta = (eax >> 16) & 0x7F;
+      return (int)tjMaxDelta;
     }
 
     public class MsrCoreThermalData

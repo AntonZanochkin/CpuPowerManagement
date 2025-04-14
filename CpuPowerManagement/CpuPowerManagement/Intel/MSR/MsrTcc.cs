@@ -1,5 +1,4 @@
 ﻿using CpuPowerManagement.CLI;
-using System.Text.RegularExpressions;
 
 namespace CpuPowerManagement.Intel.MSR
 {

@@ -4,6 +4,8 @@ using System.Runtime.CompilerServices;
 using System.Windows.Input;
 using CommunityToolkit.Mvvm.Input;
 using System.Windows;
+using CommunityToolkit.Mvvm.Messaging;
+using CpuPowerManagement.Messages;
 using static CpuPowerManagement.Intel.MSR.MsrTcc;
 
 namespace CpuPowerManagement.ViewModels.UserControls
@@ -51,7 +53,6 @@ namespace CpuPowerManagement.ViewModels.UserControls
       set
       {
         Tcc.TccOffset = Tcc.TjMax - value;
-
         SetField(ref _targetTemperature, value);
         OnPropertyChanged(nameof(Tcc.TccOffset));
       }
@@ -64,14 +65,30 @@ namespace CpuPowerManagement.ViewModels.UserControls
       if (DesignerProperties.GetIsInDesignMode(new DependencyObject()))
         Tcc = MsrTccData.CreateMock();
       else
-        Tcc = _intelManagement.ReadTccOffsetData();
+      {
+        Tcc = _intelManagement.ReadTccData();
+
+        WeakReferenceMessenger.Default.Register<TemperatureLimitRequestMessage>(this, (r, m) =>
+        {
+          SendUpdateTemperatureLimitMessage(Tcc.TjMax - Tcc.TccOffset);
+        });
+
+        SendUpdateTemperatureLimitMessage(Tcc.TjMax - Tcc.TccOffset);
+      }
     }
 
     private async Task ExecuteApplyCommandAsync()
     {
       _intelManagement.WriteTccOffsetData(_tcc);
       await Task.Delay(1000);
-      Tcc = _intelManagement.ReadTccOffsetData();
+      Tcc = _intelManagement.ReadTccData();
+
+      SendUpdateTemperatureLimitMessage(Tcc.TjMax - Tcc.TccOffset);
+    }
+
+    private void SendUpdateTemperatureLimitMessage(int value)
+    {
+      WeakReferenceMessenger.Default.Send(new UpdateTemperatureLimitMessage(value));
     }
 
     protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)

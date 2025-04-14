@@ -46,7 +46,7 @@
 
             <ui:NumberBox Name="Pl1WattsNumberBox"
                           Value="{Binding PowerLimitData.Pl1Watts, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                          Minimum="5" Maximum="105"
+                          Minimum="5" Maximum="250"
                           Grid.Column="0" 
                           SmallChange="1" 
                           MaxDecimalPlaces="0" />
@@ -134,7 +134,7 @@
             <ui:NumberBox Name="Pl2WattsNumberBox" 
                           Value="{Binding PowerLimitData.Pl2Watts, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
                           Minimum="10" 
-                          Maximum="105" 
+                          Maximum="250" 
                           Grid.Column="0" 
                           SmallChange="1" 
                           MaxDecimalPlaces="0" />

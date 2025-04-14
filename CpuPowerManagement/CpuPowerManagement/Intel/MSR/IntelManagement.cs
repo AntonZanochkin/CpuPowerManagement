@@ -14,17 +14,6 @@ namespace CpuPowerManagement.Intel.MSR
     readonly MsrCoreThermal _msrCoreThermal;
     readonly MsrPackagePower _msrPackagePower;
 
-    private int? _tjMax;
-
-    public int TjMax
-    {
-      get
-      {
-        _tjMax ??= _msrTcc.ReadTccData().TjMax;
-        return _tjMax.Value;
-      }
-    }
-
     public IntelManagement()
     {
       var folderPath = Path.GetDirectoryName(Assembly.GetEntryAssembly()?.Location) ?? string.Empty;
@@ -48,7 +37,7 @@ namespace CpuPowerManagement.Intel.MSR
       _powerLimit.WritePowerLimit(limitData);
     }
 
-    public MsrTccData ReadTccOffsetData()
+    public MsrTccData ReadTccData()
     {
       return _msrTcc.ReadTccData();
     }
@@ -58,9 +47,9 @@ namespace CpuPowerManagement.Intel.MSR
       _msrTcc.WriteTccOffset(tcc.TccOffset);
     }
 
-    public int ReadCurrentTemperature()
+    public int ReadThermalStatusReadout()
     {
-      return _msrCoreThermal.ReadCurrentTemperature(TjMax);
+      return _msrCoreThermal.ReadThermalStatusReadout();
     }
 
     public MsrPackageThermal.MsrPackageThermalData ReadPackageThermalData()

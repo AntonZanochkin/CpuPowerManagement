@@ -1,7 +1,5 @@
 ﻿using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Input;
-using CpuPowerManagement.Intel.MSR;
 using CpuPowerManagement.ViewModels.Windows;
 
 namespace CpuPowerManagement.Views.Windows

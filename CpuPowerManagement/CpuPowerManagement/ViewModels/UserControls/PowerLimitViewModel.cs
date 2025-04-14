@@ -25,34 +25,30 @@ namespace CpuPowerManagement.ViewModels.UserControls
 
     public PowerLimitViewModel()
     {
-      if (!DesignerProperties.GetIsInDesignMode(new DependencyObject()))
-      {
-        WeakReferenceMessenger.Default.Register<UpdatePowerLimit1Message>(this, (r, m) =>
-        {
-          PowerLimitData.Pl1Watts = m.Value;
-          OnPropertyChanged(nameof(PowerLimitData));
-        });
-
-        PowerLimitData = _intelManagement.ReadMsrPowerLimitData();
-      }
-      else
+      if (DesignerProperties.GetIsInDesignMode(new DependencyObject()))
       {
         PowerLimitData = MsrPowerLimitData.CreateMock();
+        return;
       }
+      
+      PowerLimitData = _intelManagement.ReadMsrPowerLimitData();
+
+      WeakReferenceMessenger.Default.Register<TdpLimitRequestMessage>(this, (r, m) =>
+      {
+        WeakReferenceMessenger.Default.Send(new UpdatePowerLimitDataMessage(PowerLimitData));
+      });
+
+      WeakReferenceMessenger.Default.Send(new UpdatePowerLimitDataMessage(PowerLimitData));
 
       ApplyCommand = new AsyncRelayCommand(ExecuteApplyCommandAsync);
     }
-
-    /*private void UpdatePowerLimit()
-    {
-      WeakReferenceMessenger.Default.Send(new UpdateTittleMessage((h++).ToString()));
-    }*/
 
     private async Task ExecuteApplyCommandAsync()
     {
       _intelManagement.WritePowerLimitData(PowerLimitData);
       await Task.Delay(1000);
       PowerLimitData = _intelManagement.ReadMsrPowerLimitData();
+      WeakReferenceMessenger.Default.Send(new UpdatePowerLimitDataMessage(PowerLimitData));
     }
 
     private static double[] GenerateValidTimeSteps()

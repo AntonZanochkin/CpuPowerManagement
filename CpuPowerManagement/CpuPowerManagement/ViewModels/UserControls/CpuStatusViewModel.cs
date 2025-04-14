@@ -7,6 +7,8 @@ using System.Windows.Media;
 using System.Windows.Threading;
 using LiveCharts;
 using LiveCharts.Wpf;
+using CommunityToolkit.Mvvm.Messaging;
+using CpuPowerManagement.Messages;
 
 namespace CpuPowerManagement.ViewModels.UserControls
 {
@@ -17,27 +19,31 @@ namespace CpuPowerManagement.ViewModels.UserControls
     private readonly DispatcherTimer _timer;
     private int _time = 0;
 
-    //private MsrCoreThermal.MsrCoreThermalData _coreThermalData;
     private MsrPackageThermal.MsrPackageThermalData _packageThermalData;
 
-    public ChartValues<int> ThermalThrottlePoints { get; set; } = new();
-    public ChartValues<int> PackageThrottlePoints { get; set; } = new();
     public ChartValues<int> CpuTemperaturePoints { get; set; } = new();
+    public ChartValues<int> CpuTemperatureLimitPoints { get; set; } = new();
+    public ChartValues<int> CpuThermalThrottlePoints { get; set; } = new();
+
+
+    public ChartValues<int> TdpPoints { get; set; } = new();
+    public ChartValues<int> TdpLimitPoints { get; set; } = new();
+    public ChartValues<int> TdpThrottlePoints { get; set; } = new();
 
     public ObservableCollection<string> Labels { get; set; } = new();
 
     public SeriesCollection Series { get; set; }
 
-    //public MsrCoreThermal.MsrCoreThermalData CoreThermalData
-    //{
-    //  get => _coreThermalData;
-    //  set => SetField(ref _coreThermalData, value);
-    //}
 
-    public MsrPackageThermal.MsrPackageThermalData PackageThermalData
+    private int? _tjMax;
+    
+    public int TjMax
     {
-      get => _packageThermalData;
-      set => SetField(ref _packageThermalData, value);
+      get
+      {
+        _tjMax ??= _intelManagement.ReadTccData().TjMax;
+        return _tjMax.Value;
+      }
     }
 
     private Brush _thermalThrottleTextBrush = Brushes.Gray;
@@ -54,6 +60,22 @@ namespace CpuPowerManagement.ViewModels.UserControls
       set => SetField(ref _cpuTemperatureText, value);
     }
 
+    private int _cpuTemperatureLimit;
+    public int CpuTemperatureLimit
+    {
+      get => _cpuTemperatureLimit;
+      set => SetField(ref _cpuTemperatureLimit, value);
+    }
+
+    private MsrPowerLimitData _powerLimitData;
+    public MsrPowerLimitData PowerLimitData
+    {
+      get => _powerLimitData;
+      set => SetField(ref _powerLimitData, value);
+    }
+
+    public int TpdMax => PowerLimitData.Pl1Enabled ? PowerLimitData.Pl1Watts : 250;
+
     private Brush _packageThrottleTextBrush = Brushes.Gray;
     public Brush PackageThrottleTextBrush
     {
@@ -61,20 +83,12 @@ namespace CpuPowerManagement.ViewModels.UserControls
       set => SetField(ref _packageThrottleTextBrush, value);
     }
 
-    private string _tpdText = "TPD: 50 W";
-    public string TpdText
+    private string _tdpText = "TDP: 50 W";
+    public string TdpText
     {
-      get => _tpdText;
-      set => SetField(ref _tpdText, value);
+      get => _tdpText;
+      set => SetField(ref _tdpText, value);
     }
-
-    // private string _cpuTemperatureText = "Cpu: 50 °C";
-    // public string CpuTemperatureText
-    // {
-    //   get => _cpuTemperatureText;
-    //   set => SetField(ref _cpuTemperatureText, value);
-    // }
-
 
     public CpuStatusViewModel()
     {
@@ -82,30 +96,77 @@ namespace CpuPowerManagement.ViewModels.UserControls
         return;
 
       Series = new SeriesCollection
-      { 
+      {
         new LineSeries
         {
           Title = "Cpu \u00b0C",
           Values = CpuTemperaturePoints,
           Stroke = Brushes.Red,
-          Fill = Brushes.Transparent
+          Fill = Brushes.Transparent,
+          LabelPoint = point => $"{point.Y * TjMax / 100:F1} °C"
         },
         new LineSeries
         {
-          Title = "Thermal Throttle",
-          Values = ThermalThrottlePoints,
-          Stroke = Brushes.DarkOrange,
-          Fill = Brushes.Transparent
+          Title = "Cpu Limit °C",
+          Values = CpuTemperatureLimitPoints,
+          Stroke = Brushes.Red,
+          LineSmoothness = 0,
+          StrokeThickness = 2,
+          StrokeDashArray = new DoubleCollection { 1, 1 },
+          PointGeometry = null,
+          Fill = Brushes.Transparent,
+          LabelPoint = point => $"{point.Y * TjMax / 100:F1} °C"
         },
+        // new LineSeries
+        // {
+        //   Title = "Thermal Throttle",
+        //   Values = CpuThermalThrottlePoints,
+        //   Stroke = Brushes.DarkRed,
+        //   Fill = Brushes.Transparent
+        // },
+
         new LineSeries
         {
-          Title = "Package Throttle",
-          Values = PackageThrottlePoints,
+          Title = "Package TDP",
+          Values = TdpPoints,
           Stroke = Brushes.DeepSkyBlue,
-          Fill = Brushes.Transparent
-        }
+          Fill = Brushes.Transparent,
+          LabelPoint = point => $"{point.Y * TpdMax / 100:F1} W"
+        },
+        new LineSeries
+        {
+          Title = "Package Limit TDP",
+          Values = TdpLimitPoints,
+          Stroke = Brushes.DeepSkyBlue,
+          StrokeDashArray = new DoubleCollection { 1, 1 },
+          PointGeometry = null,
+          Fill = Brushes.Transparent,
+          LabelPoint = point => $"{point.Y * TpdMax / 100:F1} W"
+        },
+
+        // new LineSeries
+        // {
+        //   Title = "Package Throttle",
+        //   Values = TdpThrottlePoints,
+        //   Stroke = Brushes.Blue,
+        //   Fill = Brushes.Transparent
+        // },
+        
       };
 
+      WeakReferenceMessenger.Default.Register<UpdateTemperatureLimitMessage>(this, (r, m) =>
+      {
+        CpuTemperatureLimit = m.Value;
+      });
+
+      WeakReferenceMessenger.Default.Send(new TemperatureLimitRequestMessage());
+
+      WeakReferenceMessenger.Default.Register<UpdatePowerLimitDataMessage>(this, (r, m) =>
+      {
+        PowerLimitData = m.Value;
+      });
+
+      WeakReferenceMessenger.Default.Send(new TdpLimitRequestMessage());
 
       _timer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
       _timer.Tick += (s, e) => _ = Tick();
@@ -114,32 +175,41 @@ namespace CpuPowerManagement.ViewModels.UserControls
 
     private async Task Tick()
     {
-      //CoreThermalData = _intelManagement.ReadCoreThermalData();
-      PackageThermalData = _intelManagement.ReadPackageThermalData();
-      var currentTemperature = _intelManagement.ReadCurrentTemperature();
+      var packageThermalData = _intelManagement.ReadPackageThermalData();
+      var currentTemperature = TjMax - _intelManagement.ReadThermalStatusReadout();
       var packagePowerData = await _intelManagement.ReadPackagePowerAsync();
+      
+      CpuTemperaturePoints.Add((int)((double)currentTemperature / TjMax * 100));
+      CpuTemperatureLimitPoints.Add((int)((double)CpuTemperatureLimit / TjMax * 100d));
+      //CpuThermalThrottlePoints.Add(PackageThermalData.ThermalStatus ? 100 : 0);
 
-      ThermalThrottlePoints.Add(PackageThermalData.ThermalStatus ? _intelManagement.TjMax : 0);
-      PackageThrottlePoints.Add(PackageThermalData.PowerLimitStatus ? _intelManagement.TjMax : 0);
-      CpuTemperaturePoints.Add(currentTemperature);
-
+      TdpPoints.Add((int)((double)packagePowerData.PowerWatts / TpdMax * 100d));
+      
+      TdpLimitPoints.Add((int)((double)TpdMax / TpdMax * 100d));//:)
+      //TdpThrottlePoints.Add(PackageThermalData.PowerLimitStatus ? 100 : 0);
+      
       Labels.Add(_time.ToString());
       _time++;
 
-      if (ThermalThrottlePoints.Count > 60)
+      if (Labels.Count > 60)
       {
-        ThermalThrottlePoints.RemoveAt(0);
-        PackageThrottlePoints.RemoveAt(0);
         CpuTemperaturePoints.RemoveAt(0);
+        CpuTemperatureLimitPoints.RemoveAt(0);
+        //CpuThermalThrottlePoints.RemoveAt(0);
+
+        TdpPoints.RemoveAt(0);
+        TdpLimitPoints.RemoveAt(0);
+        //TdpThrottlePoints.RemoveAt(0);
+       
         Labels.RemoveAt(0);
       }
 
-      ThermalThrottleTextBrush = PackageThermalData.ThermalStatus ? Brushes.DarkOrange : Brushes.Gray;
+      ThermalThrottleTextBrush = packageThermalData.ThermalStatus ? Brushes.Red : Brushes.Gray;
       CpuTemperatureText = $"CPU: { currentTemperature} °C";
 
-      PackageThrottleTextBrush = PackageThermalData.PowerLimitStatus ? Brushes.DeepSkyBlue : Brushes.Gray;
+      PackageThrottleTextBrush = packageThermalData.PowerLimitStatus ? Brushes.DeepSkyBlue : Brushes.Gray;
 
-      TpdText = $"TPD: {double.Round(packagePowerData.PowerWatts, MidpointRounding.ToZero) } W";
+      TdpText = $"TPD: {(int)packagePowerData.PowerWatts} W";
     }
 
     protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)

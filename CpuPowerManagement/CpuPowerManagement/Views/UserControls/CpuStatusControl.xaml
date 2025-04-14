@@ -37,7 +37,7 @@
 
       <!-- Package Throttle -->
       <TextBlock Grid.Row="1" Grid.Column="0" Text="Package Throttle" VerticalAlignment="Center" Foreground="{Binding PackageThrottleTextBrush}"/>
-      <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding TpdText}" VerticalAlignment="Center"/>
+      <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding TdpText}" VerticalAlignment="Center"/>
      
   </Grid>
 

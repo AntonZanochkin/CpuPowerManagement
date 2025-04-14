@@ -110,7 +110,6 @@ namespace CpuPowerManagement.Intel.MSR
       return (Math.Pow(2, L) * (1 + B / 4.0)) * timeUnit;
     }
 
-
     private string ConvertTdpToHexMsr(double tdp)
     {
       // Intel MSR uses a fixed Power Unit. Typically, it's 1/8 watts.
