@@ -90,6 +90,13 @@ namespace CpuPowerManagement.ViewModels.UserControls
       set => SetField(ref _tdpText, value);
     }
 
+    private string _totalWattsUsedText = "0 Wh";
+    public string TotalWattsUsedText
+    {
+      get => _totalWattsUsedText;
+      set => SetField(ref _totalWattsUsedText, value);
+    }
+
     public CpuStatusViewModel()
     {
       if (DesignerProperties.GetIsInDesignMode(new DependencyObject()))
@@ -183,11 +190,11 @@ namespace CpuPowerManagement.ViewModels.UserControls
       CpuTemperatureLimitPoints.Add((int)((double)CpuTemperatureLimit / TjMax * 100d));
       //CpuThermalThrottlePoints.Add(PackageThermalData.ThermalStatus ? 100 : 0);
 
-      TdpPoints.Add((int)((double)packagePowerData.PowerWatts / TpdMax * 100d));
+      TdpPoints.Add((int)((double)packagePowerData.PowerWatts / TpdMax * 75));
       
-      TdpLimitPoints.Add((int)((double)TpdMax / TpdMax * 100d));//:)
+      TdpLimitPoints.Add((int)((double)TpdMax / TpdMax * 75d));//:)
       //TdpThrottlePoints.Add(PackageThermalData.PowerLimitStatus ? 100 : 0);
-      
+
       Labels.Add(_time.ToString());
       _time++;
 
@@ -208,8 +215,9 @@ namespace CpuPowerManagement.ViewModels.UserControls
       CpuTemperatureText = $"CPU: { currentTemperature} °C";
 
       PackageThrottleTextBrush = packageThermalData.PowerLimitStatus ? Brushes.DeepSkyBlue : Brushes.Gray;
-
+    
       TdpText = $"TPD: {(int)packagePowerData.PowerWatts} W";
+      TotalWattsUsedText = $"{Math.Round(packagePowerData.EnergyWh, 2)} Wh";
     }
 
     protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)

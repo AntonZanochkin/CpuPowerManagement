@@ -38,14 +38,14 @@ namespace CpuPowerManagement.Intel.MSR
       return new PackagePowerData
       {
         PowerWatts = (int)power,
-        Energy = (int)energy2,
+        EnergyWh = energy2 / 3600,
       };
     }
 
     public class PackagePowerData
     {
       public int PowerWatts;
-      public int Energy;
+      public double EnergyWh;
     }
   }
 }

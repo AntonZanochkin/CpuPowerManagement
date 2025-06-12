@@ -38,14 +38,22 @@
       <!-- Package Throttle -->
       <TextBlock Grid.Row="1" Grid.Column="0" Text="Package Throttle" VerticalAlignment="Center" Foreground="{Binding PackageThrottleTextBrush}"/>
       <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding TdpText}" VerticalAlignment="Center"/>
-     
-  </Grid>
+
+      <!-- Package Throttle -->
+      <TextBlock Grid.Row="2" Grid.Column="0" Text="Total watts used" VerticalAlignment="Center"/>
+      <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding TotalWattsUsedText}" VerticalAlignment="Center"/>
+
+    </Grid>
 
     <Grid Height="150">
       <wpf:CartesianChart Series="{Binding Series}" LegendLocation="Right" DisableAnimations="True"
                           DataTooltip="{StaticResource BlackTooltip}">
         <wpf:CartesianChart.AxisX>
-          <wpf:Axis Title="Time (s)" Labels="{Binding Labels}" />
+          <wpf:Axis Title="Time (s)" Labels="{Binding Labels}" >
+            <wpf:Axis.MaxValue>59</wpf:Axis.MaxValue>
+            <!-- 0 to 59 = 60 ticks -->
+            <wpf:Axis.MinValue>0</wpf:Axis.MinValue>
+          </wpf:Axis>
         </wpf:CartesianChart.AxisX>
         <wpf:CartesianChart.AxisY>
           <wpf:Axis Title="Status" MinValue="0" MaxValue="100" />
