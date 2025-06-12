@@ -17,9 +17,7 @@
 
 ## Screenshot
 
-![Screenshot of the app](docs/screenshot.png)
-
-> *(Place your actual screenshot image at `docs/screenshot.png` in your repo.)*
+![Screenshot of the app](images/1.png)
 
 ## Architecture
 
